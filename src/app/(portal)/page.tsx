@@ -1,12 +1,11 @@
+import { Layers, Network, Settings } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NoTenantState } from "@/components/portal/no-tenant-state";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
-import { Card } from "@/components/ui/card";
+import { CompactModulesBar } from "@/features/dashboard/components/compact-modules-bar";
 import { DashboardStatsCard } from "@/features/dashboard/components/dashboard-stats-card";
-import { RecentInquiryRow } from "@/features/dashboard/components/recent-inquiry-row";
-import { SuperadminPlatformBanner } from "@/features/dashboard/components/superadmin-platform-banner";
-import { TenantModulesStatus } from "@/features/dashboard/components/tenant-modules-status";
+import { RecentInquiriesPanel } from "@/features/dashboard/components/recent-inquiries-panel";
 import {
   getTenantDashboardOverview,
   getTenantSettingsSummary,
@@ -26,9 +25,9 @@ export default async function DashboardPage(): Promise<React.JSX.Element> {
 
   if (!siteContext.activeSite || !siteContext.activeSiteKey) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <PortalPageHeader
-          title="Dashboard Portal"
+          title="Dashboard Operasional"
           description="Kelola multi-tenant landing page Mitrasova dalam satu kendali terpusat."
         />
         <NoTenantState isSuperadmin={isSuperadmin} />
@@ -42,76 +41,65 @@ export default async function DashboardPage(): Promise<React.JSX.Element> {
   ]);
 
   const statCards = buildDashboardStats(overview, settings.modules);
+  const siteTitle = settings.siteTitle ?? siteContext.activeSite.name;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PortalPageHeader
-        title={`Ringkasan ${siteContext.activeSite.name}`}
-        description={
-          settings.siteTitle ??
-          `Pantau statistik konten dan pesan masuk untuk tenant /${siteContext.activeSite.slug}.`
+        title="Dashboard Operasional"
+        description={`Ringkasan katalog, publikasi, dan konsultasi masuk — ${siteTitle}.`}
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            {isSuperadmin ? (
+              <Link
+                href="/users?tab=sites"
+                className="inline-flex h-8.5 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50"
+              >
+                <Network className="size-3.5 text-primary" />
+                <span>Situs & Pengguna</span>
+              </Link>
+            ) : null}
+            <Link
+              href="/settings"
+              className="inline-flex h-8.5 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50"
+            >
+              <Settings className="size-3.5 text-primary" />
+              <span>Pengaturan Situs</span>
+            </Link>
+            <Link
+              href="/pages"
+              className="inline-flex h-8.5 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-2xs transition-opacity hover:opacity-95"
+            >
+              <Layers className="size-3.5" />
+              <span>Kelola Halaman</span>
+            </Link>
+          </div>
         }
       />
 
-      {isSuperadmin ? (
-        <SuperadminPlatformBanner
-          totalSites={siteContext.availableSites.length}
-          activeSites={siteContext.availableSites.length}
-        />
-      ) : null}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="space-y-3 lg:col-span-4">
+          {statCards.map((card) => (
+            <DashboardStatsCard
+              key={card.href}
+              label={card.label}
+              value={card.value}
+              sublabel={card.sublabel}
+              icon={card.icon}
+              href={card.href}
+              moduleDisabled={card.disabled}
+            />
+          ))}
+        </div>
 
-      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {statCards.map((card) => (
-          <DashboardStatsCard
-            key={card.href}
-            label={card.label}
-            value={card.value}
-            sublabel={card.sublabel}
-            icon={card.icon}
-            href={card.href}
-            badge={card.badge}
-            moduleDisabled={card.disabled}
-          />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card className="overflow-hidden border border-slate-200 bg-white shadow-2xs">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900">
-                Pesan Masuk Terbaru
-              </h2>
-              <p className="text-[11px] text-slate-500">
-                5 pesan terakhir dari pengunjung website tenant ini.
-              </p>
-            </div>
-            <Link
-              href="/inquiries"
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Lihat Semua
-            </Link>
-          </div>
-
-          {overview.recentInquiries.length === 0 ? (
-            <div className="px-4 py-10 text-center text-xs text-slate-400">
-              Belum ada pesan masuk untuk tenant ini.
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {overview.recentInquiries.map((item) => (
-                <RecentInquiryRow key={item.id} inquiry={item} />
-              ))}
-            </div>
-          )}
-        </Card>
-
-        <TenantModulesStatus
-          modules={settings.modules}
-          siteName={siteContext.activeSite.name}
+        <RecentInquiriesPanel
+          inquiries={overview.recentInquiries}
+          totalCount={overview.inquiriesCount}
+          newCount={overview.newInquiriesCount}
         />
       </div>
+
+      <CompactModulesBar modules={settings.modules} />
     </div>
   );
 }

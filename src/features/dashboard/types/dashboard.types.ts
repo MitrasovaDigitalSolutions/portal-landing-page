@@ -14,12 +14,14 @@ export interface DashboardInquiryBrief {
 
 export interface TenantDashboardOverview {
   servicesCount: number;
+  featuredServicesCount: number;
   portfoliosCount: number;
   businessUnitsCount: number;
   branchesCount: number;
   testimonialsCount: number;
   partnersCount: number;
   articlesCount: number;
+  publishedArticlesCount: number;
   faqsCount: number;
   inquiriesCount: number;
   newInquiriesCount: number;
@@ -29,7 +31,6 @@ export interface TenantDashboardOverview {
 
 export interface PortalSiteSettingsSummary {
   siteTitle?: string;
-  brandColor?: string;
   logoUrl?: string;
   modules: TenantModulesState;
   rawSettings: RawSettingsMap;

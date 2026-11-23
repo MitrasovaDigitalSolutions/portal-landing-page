@@ -1,19 +1,17 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Briefcase,
-  Building2,
+  Building,
+  FileText,
   FolderKanban,
-  Globe,
-  Handshake,
   HelpCircle,
+  Inbox,
   Layers,
   LayoutDashboard,
-  Mail,
-  MapPin,
-  MessageSquareQuote,
-  Newspaper,
+  Network,
   Settings,
-  Users,
+  Star,
+  Store,
 } from "lucide-react";
 import type { TenantModuleKey } from "@/config/modules";
 
@@ -36,7 +34,7 @@ export interface PortalNavGroup {
 
 const PORTAL_NAV_GROUPS: readonly PortalNavGroup[] = [
   {
-    key: "overview",
+    key: "main",
     label: null,
     items: [
       {
@@ -45,31 +43,89 @@ const PORTAL_NAV_GROUPS: readonly PortalNavGroup[] = [
         icon: LayoutDashboard,
         scope: "global",
       },
-    ],
-  },
-  {
-    key: "platform",
-    label: "Platform Global",
-    items: [
       {
-        label: "Kelola Tenant",
-        href: "/sites",
-        icon: Globe,
-        scope: "global",
-        superadminOnly: true,
-      },
-      {
-        label: "Manajemen User",
-        href: "/users",
-        icon: Users,
-        scope: "global",
-        superadminOnly: true,
+        label: "Pesan Masuk",
+        href: "/inquiries",
+        icon: Inbox,
+        scope: "tenant",
+        moduleKey: "contact",
       },
     ],
   },
   {
     key: "website",
-    label: "Website & Tampilan",
+    label: "Website",
+    items: [
+      {
+        label: "Halaman",
+        href: "/pages",
+        icon: Layers,
+        scope: "tenant",
+      },
+      {
+        label: "Artikel & Berita",
+        href: "/articles",
+        icon: FileText,
+        scope: "tenant",
+        moduleKey: "news",
+      },
+      {
+        label: "FAQ",
+        href: "/faqs",
+        icon: HelpCircle,
+        scope: "tenant",
+      },
+      {
+        label: "Testimoni & Mitra",
+        href: "/showcase",
+        icon: Star,
+        scope: "tenant",
+      },
+    ],
+  },
+  {
+    key: "business",
+    label: "Business",
+    items: [
+      {
+        label: "Produk & Layanan",
+        href: "/services",
+        icon: Briefcase,
+        scope: "tenant",
+        moduleKey: "services",
+      },
+      {
+        label: "Portfolio",
+        href: "/portfolios",
+        icon: FolderKanban,
+        scope: "tenant",
+        moduleKey: "portfolios",
+      },
+    ],
+  },
+  {
+    key: "organization",
+    label: "Organization",
+    items: [
+      {
+        label: "Kantor & Cabang",
+        href: "/branches",
+        icon: Building,
+        scope: "tenant",
+        moduleKey: "branches",
+      },
+      {
+        label: "Unit Usaha",
+        href: "/business-units",
+        icon: Store,
+        scope: "tenant",
+        moduleKey: "business_units",
+      },
+    ],
+  },
+  {
+    key: "settings",
+    label: "Settings",
     items: [
       {
         label: "Pengaturan Situs",
@@ -78,82 +134,11 @@ const PORTAL_NAV_GROUPS: readonly PortalNavGroup[] = [
         scope: "tenant",
       },
       {
-        label: "Halaman & Seksi",
-        href: "/pages",
-        icon: Layers,
-        scope: "tenant",
-      },
-    ],
-  },
-  {
-    key: "content",
-    label: "Konten & Layanan",
-    items: [
-      {
-        label: "Layanan / Produk",
-        href: "/services",
-        icon: Briefcase,
-        scope: "tenant",
-        moduleKey: "services",
-      },
-      {
-        label: "Portofolio",
-        href: "/portfolios",
-        icon: FolderKanban,
-        scope: "tenant",
-        moduleKey: "portfolios",
-      },
-      {
-        label: "Unit Bisnis",
-        href: "/business-units",
-        icon: Building2,
-        scope: "tenant",
-        moduleKey: "business_units",
-      },
-      {
-        label: "Kantor Cabang",
-        href: "/branches",
-        icon: MapPin,
-        scope: "tenant",
-        moduleKey: "branches",
-      },
-      {
-        label: "Testimoni",
-        href: "/testimonials",
-        icon: MessageSquareQuote,
-        scope: "tenant",
-      },
-      {
-        label: "Mitra / Partner",
-        href: "/partners",
-        icon: Handshake,
-        scope: "tenant",
-      },
-    ],
-  },
-  {
-    key: "engagement",
-    label: "Publikasi & Interaksi",
-    items: [
-      {
-        label: "Berita & Artikel",
-        href: "/articles",
-        icon: Newspaper,
-        scope: "tenant",
-        moduleKey: "news",
-      },
-      {
-        label: "FAQ & Bantuan",
-        href: "/faqs",
-        icon: HelpCircle,
-        scope: "tenant",
-      },
-      {
-        label: "Pesan Masuk",
-        href: "/inquiries",
-        icon: Mail,
-        scope: "tenant",
-        moduleKey: "contact",
+        label: "Situs & Pengguna",
+        href: "/users",
+        icon: Network,
+        scope: "global",
+        superadminOnly: true,
       },
     ],
   },
@@ -183,8 +168,27 @@ export function getPortalNavGroups({
 }
 
 export function isNavItemActive(pathname: string, href: string): boolean {
-  if (href === "/") {
-    return pathname === "/";
+  const normalizedCurrent = pathname.replace(/\/+$/, "") || "/";
+  const normalizedHref = href.replace(/\/+$/, "") || "/";
+
+  if (normalizedHref === "/") {
+    return normalizedCurrent === "/";
   }
-  return pathname === href || pathname.startsWith(`${href}/`);
+
+  if (
+    normalizedHref === "/showcase" &&
+    (normalizedCurrent.startsWith("/testimonials") ||
+      normalizedCurrent.startsWith("/partners"))
+  ) {
+    return true;
+  }
+
+  if (normalizedHref === "/users" && normalizedCurrent.startsWith("/sites")) {
+    return true;
+  }
+
+  return (
+    normalizedCurrent === normalizedHref ||
+    normalizedCurrent.startsWith(`${normalizedHref}/`)
+  );
 }

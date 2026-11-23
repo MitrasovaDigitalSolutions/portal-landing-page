@@ -25,7 +25,7 @@ export async function saveTestimonialAction(
       ? await testimonialsRepository.update(id, formData, siteKey)
       : await testimonialsRepository.create(formData, siteKey);
 
-    revalidatePortalPaths(["/testimonials", "/"]);
+    revalidatePortalPaths(["/showcase", "/"]);
     return {
       success: true,
       data,
@@ -41,7 +41,7 @@ export async function deleteTestimonialAction(
 ): Promise<ActionResult> {
   return withTenantAction(async ({ siteKey }) => {
     await testimonialsRepository.delete(id, siteKey);
-    revalidatePortalPaths(["/testimonials", "/"]);
+    revalidatePortalPaths(["/showcase", "/"]);
     return {
       success: true,
       data: undefined,

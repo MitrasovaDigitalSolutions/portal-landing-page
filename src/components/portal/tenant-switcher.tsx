@@ -7,13 +7,14 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { TenantSwitcherItem } from "@/components/portal/tenant-switcher-item";
+import { TenantSwitcherSearch } from "@/components/portal/tenant-switcher-search";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Scrollable } from "@/components/ui/scrollable";
 import { switchActiveSiteAction } from "@/lib/tenant/tenant.actions";
 import { useTenant } from "@/providers/tenant-provider";
 import type { AuthSiteSummary } from "@/types/auth.types";
@@ -33,7 +34,7 @@ export function TenantSwitcher(): React.JSX.Element {
         <span>Belum ada tenant</span>
         {isSuperadmin ? (
           <Link
-            href="/sites"
+            href="/users?tab=sites"
             className="font-semibold text-primary hover:underline"
           >
             Kelola
@@ -73,8 +74,15 @@ export function TenantSwitcher(): React.JSX.Element {
     });
   };
 
+  const handleOpenChange = (nextOpen: boolean): void => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setSearch("");
+    }
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         render={
           <Button
@@ -82,11 +90,11 @@ export function TenantSwitcher(): React.JSX.Element {
             variant="outline"
             size="sm"
             disabled={isPending}
-            className="h-9 max-w-[260px] justify-between gap-2 rounded-xl border-slate-200 bg-white px-2.5 text-xs shadow-2xs"
+            className="h-8 max-w-[230px] justify-between gap-2 rounded-lg border-slate-200 bg-white px-2 text-xs shadow-2xs hover:bg-slate-50"
           />
         }
       >
-        <span className="flex min-w-0 items-center gap-2">
+        <span className="flex min-w-0 items-center gap-1.5">
           <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             {isPending ? (
               <Loader2 className="size-3 animate-spin" />
@@ -101,46 +109,48 @@ export function TenantSwitcher(): React.JSX.Element {
         <ChevronsUpDown className="size-3.5 shrink-0 text-slate-400" />
       </PopoverTrigger>
 
-      <PopoverContent align="start" className="w-72 p-2">
+      <PopoverContent align="start" className="w-64 overflow-hidden p-0">
         {availableSites.length > 4 ? (
-          <div className="mb-2">
-            <Input
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-              }}
-              placeholder="Cari tenant atau slug..."
-              className="h-8 text-xs"
-            />
+          <TenantSwitcherSearch value={search} onChange={setSearch} />
+        ) : (
+          <div className="flex items-center justify-between border-b border-slate-100 px-2.5 py-1.5">
+            <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+              Pilih Tenant
+            </span>
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+              {availableSites.length}
+            </span>
           </div>
-        ) : null}
+        )}
 
-        <div className="max-h-60 space-y-1 overflow-y-auto">
-          {filteredSites.length === 0 ? (
-            <p className="py-4 text-center text-xs text-slate-400">
-              Tenant tidak ditemukan.
-            </p>
-          ) : (
-            filteredSites.map((site) => (
-              <TenantSwitcherItem
-                key={site.id}
-                site={site}
-                isSelected={site.slug === activeSite?.slug}
-                disabled={isPending}
-                onSelect={handleSelect}
-              />
-            ))
-          )}
-        </div>
+        <Scrollable className="max-h-52">
+          <div className="space-y-0.5 p-1">
+            {filteredSites.length === 0 ? (
+              <p className="py-4 text-center text-[11px] text-slate-400">
+                Tenant tidak ditemukan.
+              </p>
+            ) : (
+              filteredSites.map((site) => (
+                <TenantSwitcherItem
+                  key={site.id}
+                  site={site}
+                  isSelected={site.slug === activeSite?.slug}
+                  disabled={isPending}
+                  onSelect={handleSelect}
+                />
+              ))
+            )}
+          </div>
+        </Scrollable>
 
         {isSuperadmin ? (
-          <div className="mt-2 border-t border-slate-100 pt-2">
+          <div className="border-t border-slate-100 p-1">
             <Link
-              href="/sites"
+              href="/users?tab=sites"
               onClick={() => {
                 setOpen(false);
               }}
-              className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-primary"
             >
               <Globe className="size-3.5 text-primary" />
               <span>Kelola Semua Tenant</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Globe, Loader2, LogOut, ShieldCheck, Users } from "lucide-react";
+import { ChevronDown, Loader2, LogOut, Network, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -86,24 +86,14 @@ export function PortalUserMenu({
         {isSuperadmin ? (
           <div className="space-y-0.5 border-b border-slate-100 py-1.5">
             <Link
-              href="/sites"
-              onClick={() => {
-                setOpen(false);
-              }}
-              className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
-            >
-              <Globe className="size-3.5 text-slate-500" />
-              <span>Kelola Tenant</span>
-            </Link>
-            <Link
               href="/users"
               onClick={() => {
                 setOpen(false);
               }}
               className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
             >
-              <Users className="size-3.5 text-slate-500" />
-              <span>Manajemen User</span>
+              <Network className="size-3.5 text-slate-500" />
+              <span>Situs & Pengguna</span>
             </Link>
           </div>
         ) : null}

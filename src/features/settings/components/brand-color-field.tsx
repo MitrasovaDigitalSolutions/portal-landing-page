@@ -63,7 +63,7 @@ export function BrandColorField(): React.JSX.Element {
         </div>
       </div>
       <p className="text-[11px] text-slate-500">
-        Menentukan warna aksen utama pada website publik dan panel portal tenant ini.
+        Menentukan warna aksen utama pada website publik tenant ini.
       </p>
     </div>
   );

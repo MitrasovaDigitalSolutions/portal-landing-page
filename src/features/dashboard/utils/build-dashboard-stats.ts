@@ -1,26 +1,19 @@
 import {
   Briefcase,
-  Building2,
-  FolderKanban,
-  Handshake,
-  HelpCircle,
-  Layers,
+  Building,
+  FileText,
   type LucideIcon,
-  Mail,
-  MapPin,
-  MessageSquareQuote,
-  Newspaper,
+  Star,
 } from "lucide-react";
 import { isTenantModuleActive, type TenantModulesState } from "@/config/modules";
 import type { TenantDashboardOverview } from "@/features/dashboard/types/dashboard.types";
 
 export interface DashboardStatItem {
   label: string;
-  value: number | string;
-  sublabel?: string;
+  value: string;
+  sublabel: string;
   icon: LucideIcon;
   href: string;
-  badge?: string;
   disabled: boolean;
 }
 
@@ -30,79 +23,36 @@ export function buildDashboardStats(
 ): DashboardStatItem[] {
   return [
     {
-      label: "Layanan / Produk",
-      value: overview.servicesCount,
+      label: "Katalog & Portofolio",
+      value: `${overview.servicesCount} Layanan`,
+      sublabel: `${overview.featuredServicesCount} unggulan • ${overview.portfoliosCount} portofolio`,
       icon: Briefcase,
       href: "/services",
       disabled: !isTenantModuleActive(modules, "services"),
     },
     {
-      label: "Portofolio",
-      value: overview.portfoliosCount,
-      icon: FolderKanban,
-      href: "/portfolios",
-      disabled: !isTenantModuleActive(modules, "portfolios"),
-    },
-    {
-      label: "Berita & Artikel",
-      value: overview.articlesCount,
-      icon: Newspaper,
+      label: "Publikasi & Edukasi",
+      value: `${overview.articlesCount} Artikel`,
+      sublabel: `${overview.publishedArticlesCount} terbit • ${overview.faqsCount} FAQ`,
+      icon: FileText,
       href: "/articles",
       disabled: !isTenantModuleActive(modules, "news"),
     },
     {
-      label: "Unit Bisnis",
-      value: overview.businessUnitsCount,
-      icon: Building2,
-      href: "/business-units",
-      disabled: !isTenantModuleActive(modules, "business_units"),
+      label: "Kredibilitas & Kemitraan",
+      value: `${overview.testimonialsCount + overview.partnersCount} Entri`,
+      sublabel: `${overview.testimonialsCount} testimoni • ${overview.partnersCount} partner`,
+      icon: Star,
+      href: "/showcase",
+      disabled: false,
     },
     {
-      label: "Kantor Cabang",
-      value: overview.branchesCount,
-      icon: MapPin,
+      label: "Organisasi & Jaringan",
+      value: `${overview.branchesCount} Cabang`,
+      sublabel: `${overview.businessUnitsCount} unit usaha • ${overview.pagesCount} halaman`,
+      icon: Building,
       href: "/branches",
       disabled: !isTenantModuleActive(modules, "branches"),
-    },
-    {
-      label: "Halaman & Seksi",
-      value: overview.pagesCount,
-      icon: Layers,
-      href: "/pages",
-      disabled: false,
-    },
-    {
-      label: "Testimoni & Partner",
-      value: `${overview.testimonialsCount} / ${overview.partnersCount}`,
-      sublabel: "Testimoni & Mitra",
-      icon: MessageSquareQuote,
-      href: "/testimonials",
-      disabled: false,
-    },
-    {
-      label: "FAQ & Bantuan",
-      value: overview.faqsCount,
-      icon: HelpCircle,
-      href: "/faqs",
-      disabled: false,
-    },
-    {
-      label: "Pesan Masuk",
-      value: overview.inquiriesCount,
-      badge:
-        overview.newInquiriesCount > 0
-          ? `${overview.newInquiriesCount} Baru`
-          : undefined,
-      icon: Mail,
-      href: "/inquiries",
-      disabled: !isTenantModuleActive(modules, "contact"),
-    },
-    {
-      label: "Mitra / Partner",
-      value: overview.partnersCount,
-      icon: Handshake,
-      href: "/partners",
-      disabled: false,
     },
   ];
 }

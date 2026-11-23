@@ -9,7 +9,6 @@ export interface TenantContextValue {
   availableSites: AuthSiteSummary[];
   isSuperadmin: boolean;
   modules: TenantModulesState;
-  brandColor?: string;
   siteTitle?: string;
   logoUrl?: string;
 }

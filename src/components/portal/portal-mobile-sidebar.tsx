@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck } from "lucide-react";
+import { Landmark } from "lucide-react";
 import { PortalNavList } from "@/components/portal/portal-nav-list";
 import { Scrollable } from "@/components/ui/scrollable";
 import {
@@ -22,16 +22,16 @@ export function PortalMobileSidebar({
 
   return (
     <Sheet open={isMobileOpen} onOpenChange={setMobileOpen}>
-      <SheetContent side="left" className="w-72 gap-0 bg-white p-0">
-        <SheetHeader className="border-b border-slate-100 px-4 py-3.5">
-          <SheetTitle className="flex items-center gap-2.5 text-left text-sm font-bold text-slate-900">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-white">
-              <ShieldCheck className="size-4" />
-            </span>
-            <span className="truncate">{brandName}</span>
+      <SheetContent side="left" className="flex w-60 flex-col gap-0 bg-white p-0">
+        <SheetHeader className="flex h-14 flex-row items-center gap-2.5 border-b border-slate-100 px-4 text-left">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-white">
+            <Landmark className="size-4" />
+          </span>
+          <SheetTitle className="truncate text-sm font-bold text-slate-900">
+            {brandName}
           </SheetTitle>
         </SheetHeader>
-        <Scrollable className="flex-1">
+        <Scrollable className="min-h-0 flex-1">
           <PortalNavList
             onNavigate={() => {
               setMobileOpen(false);

@@ -1,22 +1,33 @@
 import type { Metadata } from "next";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SitesTable } from "@/features/tenants/components/sites-table";
 import { SuperadminGuard } from "@/features/tenants/components/superadmin-guard";
 import { UsersTable } from "@/features/tenants/components/users-table";
 import { tenantsRepository } from "@/features/tenants/repositories/tenants.repository";
 import { getPortalSession } from "@/lib/auth/auth";
 
 export const metadata: Metadata = {
-  title: "Manajemen User",
+  title: "Situs & Pengguna",
 };
 
-export default async function UsersPage(): Promise<React.JSX.Element> {
-  const session = await getPortalSession();
+interface UsersPageProps {
+  searchParams: Promise<{ tab?: string }>;
+}
+
+export default async function UsersPage({
+  searchParams,
+}: UsersPageProps): Promise<React.JSX.Element> {
+  const [{ tab }, session] = await Promise.all([
+    searchParams,
+    getPortalSession(),
+  ]);
 
   if (!session?.accessToken || !session.user.is_superadmin) {
     return (
       <SuperadminGuard
-        title="Manajemen User & Role"
-        description="Kelola akun administrator dan penugasan akses ke masing-masing tenant."
+        title="Situs & Pengguna"
+        description="Kelola daftar tenant unit usaha, akun admin, dan penugasan role per site."
       />
     );
   }
@@ -28,14 +39,39 @@ export default async function UsersPage(): Promise<React.JSX.Element> {
 
   const users = usersResult.status === "fulfilled" ? usersResult.value : [];
   const sites = sitesResult.status === "fulfilled" ? sitesResult.value : [];
+  const defaultTab = tab === "sites" ? "sites" : "users";
 
   return (
     <div className="space-y-6">
       <PortalPageHeader
-        title="Manajemen User & Role"
-        description="Kelola akun Superadmin, Admin Site, Editor, dan hak akses tiap unit usaha."
+        title="Situs & Pengguna"
+        description="Kelola daftar tenant unit usaha (sites), akun administrator, dan penugasan role per site."
       />
-      <UsersTable users={users} sites={sites} />
+
+      <Tabs defaultValue={defaultTab} className="w-full">
+        <TabsList className="mb-4 h-10 rounded-xl bg-slate-100 p-1">
+          <TabsTrigger
+            value="users"
+            className="rounded-lg px-4 text-xs font-semibold sm:text-sm"
+          >
+            Pengguna & Akses Site ({users.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="sites"
+            className="rounded-lg px-4 text-xs font-semibold sm:text-sm"
+          >
+            Unit Usaha / Tenant Sites ({sites.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users">
+          <UsersTable users={users} sites={sites} />
+        </TabsContent>
+
+        <TabsContent value="sites">
+          <SitesTable sites={sites} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

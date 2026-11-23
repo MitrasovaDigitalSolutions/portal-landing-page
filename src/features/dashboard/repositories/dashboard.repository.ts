@@ -9,6 +9,14 @@ import type {
   TenantDashboardOverview,
 } from "@/features/dashboard/types/dashboard.types";
 
+interface ServiceSummaryDto {
+  is_featured?: boolean;
+}
+
+interface ArticleSummaryDto {
+  status?: string;
+}
+
 function readStringField(
   group: Record<string, unknown> | undefined,
   key: string
@@ -31,7 +39,6 @@ export async function getTenantSettingsSummary(
     const general = rawSettings.general;
     return {
       siteTitle: readStringField(general, "site_title"),
-      brandColor: readStringField(general, "brand_color"),
       logoUrl: readStringField(general, "logo_url"),
       modules: extractModulesState(rawSettings),
       rawSettings,
@@ -46,13 +53,48 @@ export async function getTenantSettingsSummary(
 
 async function fetchCount(path: string, siteKey: string): Promise<number> {
   try {
-    const res = await portalApi.tenantGet<unknown[] | PaginatedResponse<unknown>>(
-      path,
-      { siteKey, query: { per_page: 1 } }
-    );
+    const res = await portalApi.tenantGet<
+      unknown[] | PaginatedResponse<unknown>
+    >(path, { siteKey, query: { per_page: 1 } });
     return normalizeListResponse(res).total;
   } catch {
     return 0;
+  }
+}
+
+async function fetchServicesSummary(
+  siteKey: string
+): Promise<{ total: number; featured: number }> {
+  try {
+    const res = await portalApi.tenantGet<
+      ServiceSummaryDto[] | PaginatedResponse<ServiceSummaryDto>
+    >("/admin/services", { siteKey, query: { per_page: 100 } });
+    const normalized = normalizeListResponse(res);
+    return {
+      total: normalized.total,
+      featured: normalized.items.filter((item) => Boolean(item.is_featured))
+        .length,
+    };
+  } catch {
+    return { total: 0, featured: 0 };
+  }
+}
+
+async function fetchArticlesSummary(
+  siteKey: string
+): Promise<{ total: number; published: number }> {
+  try {
+    const res = await portalApi.tenantGet<
+      ArticleSummaryDto[] | PaginatedResponse<ArticleSummaryDto>
+    >("/admin/articles", { siteKey, query: { per_page: 100 } });
+    const normalized = normalizeListResponse(res);
+    return {
+      total: normalized.total,
+      published: normalized.items.filter((item) => item.status === "published")
+        .length,
+    };
+  } catch {
+    return { total: 0, published: 0 };
   }
 }
 
@@ -85,37 +127,39 @@ export async function getTenantDashboardOverview(
 ): Promise<TenantDashboardOverview> {
   const [
     pagesCount,
-    servicesCount,
+    servicesSummary,
     portfoliosCount,
     businessUnitsCount,
     branchesCount,
     testimonialsCount,
     partnersCount,
-    articlesCount,
+    articlesSummary,
     faqsCount,
     inquiries,
   ] = await Promise.all([
     fetchCount("/admin/pages", siteKey),
-    fetchCount("/admin/services", siteKey),
+    fetchServicesSummary(siteKey),
     fetchCount("/admin/portfolios", siteKey),
     fetchCount("/admin/business-units", siteKey),
     fetchCount("/admin/branches", siteKey),
     fetchCount("/admin/testimonials", siteKey),
     fetchCount("/admin/partners", siteKey),
-    fetchCount("/admin/articles", siteKey),
+    fetchArticlesSummary(siteKey),
     fetchCount("/admin/faqs", siteKey),
     fetchInquiriesSummary(siteKey),
   ]);
 
   return {
     pagesCount,
-    servicesCount,
+    servicesCount: servicesSummary.total,
+    featuredServicesCount: servicesSummary.featured,
     portfoliosCount,
     businessUnitsCount,
     branchesCount,
     testimonialsCount,
     partnersCount,
-    articlesCount,
+    articlesCount: articlesSummary.total,
+    publishedArticlesCount: articlesSummary.published,
     faqsCount,
     inquiriesCount: inquiries.total,
     newInquiriesCount: inquiries.newCount,

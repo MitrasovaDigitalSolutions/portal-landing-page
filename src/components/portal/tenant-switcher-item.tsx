@@ -1,7 +1,6 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { AuthSiteSummary } from "@/types/auth.types";
 
@@ -26,27 +25,43 @@ export function TenantSwitcherItem({
         onSelect(site);
       }}
       className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-xs transition-colors",
+        "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left transition-colors disabled:opacity-50",
         isSelected
-          ? "bg-primary/10 text-primary"
-          : "text-slate-700 hover:bg-slate-100"
+          ? "bg-primary/8 text-primary"
+          : "text-slate-700 hover:bg-slate-100/80"
       )}
     >
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold">{site.name}</span>
-        <span className="block truncate text-[10px] text-slate-400">
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span
+          className={cn(
+            "truncate text-xs leading-tight",
+            isSelected ? "font-semibold" : "font-medium"
+          )}
+        >
+          {site.name}
+        </span>
+        <span className="truncate text-[10px] leading-tight text-slate-400">
           /{site.slug}
         </span>
       </span>
 
       <span className="flex shrink-0 items-center gap-1.5">
-        <Badge
-          variant="secondary"
-          className="px-1.5 py-0 text-[10px] capitalize"
+        <span
+          className={cn(
+            "inline-flex h-4 items-center rounded px-1.5 text-[10px] font-medium capitalize",
+            isSelected
+              ? "bg-primary/15 text-primary"
+              : "bg-slate-100 text-slate-500"
+          )}
         >
           {site.role}
-        </Badge>
-        {isSelected ? <Check className="size-3.5 shrink-0" /> : null}
+        </span>
+        <Check
+          className={cn(
+            "size-3.5 shrink-0 text-primary transition-opacity",
+            isSelected ? "opacity-100" : "opacity-0"
+          )}
+        />
       </span>
     </button>
   );

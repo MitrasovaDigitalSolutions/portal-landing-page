@@ -3,9 +3,7 @@
 import { Menu } from "lucide-react";
 import { PortalUserMenu } from "@/components/portal/portal-user-menu";
 import { TenantSwitcher } from "@/components/portal/tenant-switcher";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTenant } from "@/providers/tenant-provider";
 import { useSidebarStore } from "@/stores/sidebar-store";
 
 interface PortalHeaderProps {
@@ -20,32 +18,22 @@ export function PortalHeader({
   isSuperadmin,
 }: PortalHeaderProps): React.JSX.Element {
   const { toggleMobile } = useSidebarStore();
-  const { activeSite } = useTenant();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-2.5">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           size="icon-sm"
           onClick={toggleMobile}
-          aria-label="Buka navigasi"
-          className="md:hidden"
+          aria-label="Menu Admin"
+          className="rounded-lg border-slate-200 lg:hidden"
         >
-          <Menu className="size-5" />
+          <Menu className="size-4" />
         </Button>
 
         <TenantSwitcher />
-
-        {activeSite ? (
-          <Badge
-            variant="secondary"
-            className="hidden capitalize sm:inline-flex"
-          >
-            Role: {isSuperadmin ? "superadmin" : activeSite.role}
-          </Badge>
-        ) : null}
       </div>
 
       <PortalUserMenu

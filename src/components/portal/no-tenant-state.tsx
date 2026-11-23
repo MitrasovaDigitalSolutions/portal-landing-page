@@ -27,7 +27,7 @@ export function NoTenantState({
           <Button
             size="sm"
             className="rounded-xl text-xs font-semibold"
-            render={<Link href="/sites" />}
+            render={<Link href="/users?tab=sites" />}
           >
             <Plus className="size-4" />
             <span>Kelola Tenant</span>

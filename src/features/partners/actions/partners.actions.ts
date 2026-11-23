@@ -32,7 +32,7 @@ export async function savePartnerAction(
       ? await partnersRepository.update(id, formData, siteKey)
       : await partnersRepository.create(formData, siteKey);
 
-    revalidatePortalPaths(["/partners", "/"]);
+    revalidatePortalPaths(["/showcase", "/"]);
     return {
       success: true,
       data,
@@ -46,7 +46,7 @@ export async function savePartnerAction(
 export async function deletePartnerAction(id: number): Promise<ActionResult> {
   return withTenantAction(async ({ siteKey }) => {
     await partnersRepository.delete(id, siteKey);
-    revalidatePortalPaths(["/partners", "/"]);
+    revalidatePortalPaths(["/showcase", "/"]);
     return {
       success: true,
       data: undefined,
