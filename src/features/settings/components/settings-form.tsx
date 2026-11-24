@@ -5,6 +5,7 @@ import {
   Loader2,
   PhoneCall,
   Save,
+  Search,
   Share2,
   SlidersHorizontal,
 } from "lucide-react";
@@ -14,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SettingsContactTab } from "@/features/settings/components/settings-contact-tab";
 import { SettingsGeneralTab } from "@/features/settings/components/settings-general-tab";
 import { SettingsModulesTab } from "@/features/settings/components/settings-modules-tab";
+import { SettingsSeoTab } from "@/features/settings/components/settings-seo-tab";
 import { SettingsSocialTab } from "@/features/settings/components/settings-social-tab";
 import { useSettingsForm } from "@/features/settings/hooks/use-settings-form";
 import type { SiteSettingsMap } from "@/types/cms.types";
@@ -54,6 +56,10 @@ export function SettingsForm({
               <Share2 className="size-3.5" />
               <span>Media Sosial</span>
             </TabsTrigger>
+            <TabsTrigger value="seo" className="gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold">
+              <Search className="size-3.5" />
+              <span>SEO & Pencarian</span>
+            </TabsTrigger>
             <TabsTrigger value="modules" className="gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold">
               <SlidersHorizontal className="size-3.5" />
               <span>Visibilitas Modul</span>
@@ -70,6 +76,10 @@ export function SettingsForm({
 
           <TabsContent value="social" className="mt-0">
             <SettingsSocialTab />
+          </TabsContent>
+
+          <TabsContent value="seo" className="mt-0">
+            <SettingsSeoTab />
           </TabsContent>
 
           <TabsContent value="modules" className="mt-0">

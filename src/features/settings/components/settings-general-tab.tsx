@@ -64,13 +64,6 @@ export function SettingsGeneralTab({
         </div>
       </div>
 
-      <FormInput<SettingsFormValues>
-        name="meta_keywords"
-        label="Kata Kunci SEO (Meta Keywords)"
-        placeholder="koperasi, layanan keuangan, simpan pinjam, konsultasi bisnis"
-        helperText="Pisahkan setiap kata kunci dengan tanda koma."
-      />
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormInput<SettingsFormValues>
           name="badan_hukum"

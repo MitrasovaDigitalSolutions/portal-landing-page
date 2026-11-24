@@ -34,6 +34,21 @@ function buildBulkPayload(values: SettingsFormValues): SettingsBulkPayload {
       { group: "social", key: "facebook", value: nullableText(values.facebook) },
       { group: "social", key: "linkedin", value: nullableText(values.linkedin) },
       { group: "social", key: "tiktok", value: nullableText(values.tiktok) },
+      { group: "seo", key: "meta_title", value: nullableText(values.seo_meta_title) },
+      { group: "seo", key: "meta_description", value: nullableText(values.seo_meta_description) },
+      { group: "seo", key: "alternate_names", value: nullableText(values.seo_alternate_names) },
+      { group: "seo", key: "canonical_domain", value: nullableText(values.seo_canonical_domain) },
+      { group: "seo", key: "schema_type", value: nullableText(values.seo_schema_type) },
+      {
+        group: "seo",
+        key: "google_verification",
+        value: nullableText(values.seo_google_verification),
+      },
+      {
+        group: "seo",
+        key: "robots_index",
+        value: values.seo_robots_index ? "true" : "false",
+      },
       {
         group: "modules",
         key: "is_active",

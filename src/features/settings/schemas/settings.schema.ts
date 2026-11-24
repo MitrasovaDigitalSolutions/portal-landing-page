@@ -38,6 +38,29 @@ export const settingsFormSchema = z.object({
   modules_careers: z.boolean(),
   modules_news: z.boolean(),
   modules_contact: z.boolean(),
+  seo_meta_title: z.string().trim().max(150, "Judul SEO maksimal 150 karakter."),
+  seo_meta_description: z
+    .string()
+    .trim()
+    .max(320, "Deskripsi SEO maksimal 320 karakter."),
+  seo_alternate_names: z
+    .string()
+    .trim()
+    .max(300, "Nama alternatif terlalu panjang."),
+  seo_canonical_domain: z
+    .string()
+    .trim()
+    .max(255, "Domain terlalu panjang.")
+    .refine(
+      (val) => val.length === 0 || /^https?:\/\/.+/.test(val),
+      "Gunakan URL lengkap diawali http:// atau https://"
+    ),
+  seo_schema_type: z.string().trim().max(60, "Tipe schema tidak valid."),
+  seo_google_verification: z
+    .string()
+    .trim()
+    .max(200, "Kode verifikasi terlalu panjang."),
+  seo_robots_index: z.boolean(),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;

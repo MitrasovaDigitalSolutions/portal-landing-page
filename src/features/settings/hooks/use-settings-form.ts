@@ -22,11 +22,27 @@ function readSettingText(
   return typeof val === "string" ? val : fallback;
 }
 
+function readSettingBoolean(
+  group: Record<string, unknown> | undefined,
+  key: string,
+  fallback = true
+): boolean {
+  const val = group?.[key];
+  if (typeof val === "boolean") {
+    return val;
+  }
+  if (typeof val === "string") {
+    return val !== "false";
+  }
+  return fallback;
+}
+
 function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
   const general = settings.general;
   const legal = settings.legal;
   const contact = settings.contact;
   const social = settings.social;
+  const seo = settings.seo;
   const modules = extractModulesState(settings);
 
   return {
@@ -54,6 +70,14 @@ function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
     modules_careers: isTenantModuleActive(modules, "careers"),
     modules_news: isTenantModuleActive(modules, "news"),
     modules_contact: isTenantModuleActive(modules, "contact"),
+    seo_meta_title: readSettingText(seo, "meta_title"),
+    seo_meta_description: readSettingText(seo, "meta_description"),
+    seo_alternate_names: readSettingText(seo, "alternate_names"),
+    seo_canonical_domain: readSettingText(seo, "canonical_domain"),
+    seo_schema_type:
+      readSettingText(seo, "schema_type", "Organization") || "Organization",
+    seo_google_verification: readSettingText(seo, "google_verification"),
+    seo_robots_index: readSettingBoolean(seo, "robots_index", true),
   };
 }
 
