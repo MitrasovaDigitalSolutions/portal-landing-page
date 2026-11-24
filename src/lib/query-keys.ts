@@ -45,4 +45,7 @@ export const queryKeys = {
   statistics: {
     all: (siteKey: string) => ["statistics", siteKey] as const,
   },
+  media: {
+    all: (siteKey: string) => ["media", siteKey] as const,
+  },
 } as const;

@@ -192,3 +192,33 @@ export interface InquiryItem {
   created_at: string;
   updated_at?: string;
 }
+
+export interface MediaUsageRef {
+  type: string;
+  id: number | string;
+  label: string | null;
+  field: string;
+}
+
+export interface MediaItem {
+  path: string;
+  url: string;
+  size: number;
+  modified_at: string;
+  owner_site: string | null;
+  usage: MediaUsageRef[];
+}
+
+export interface ReplaceMediaResult {
+  path: string;
+  previous_path: string;
+  url: string;
+  size: number;
+  modified_at: string;
+  references_updated: number;
+}
+
+export interface DeleteMediaResult {
+  path: string;
+  usage: MediaUsageRef[];
+}
