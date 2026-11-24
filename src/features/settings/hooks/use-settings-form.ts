@@ -5,7 +5,9 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import { extractModulesState, isTenantModuleActive } from "@/config/modules";
 import { saveSettingsAction } from "@/features/settings/actions/settings.actions";
 import {
+  SERVICES_LAYOUT_VALUES,
   settingsFormSchema,
+  type ServicesLayoutOption,
   type SettingsFormValues,
 } from "@/features/settings/schemas/settings.schema";
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
@@ -35,6 +37,19 @@ function readSettingBoolean(
     return val !== "false";
   }
   return fallback;
+}
+
+function readServicesLayout(
+  group: Record<string, unknown> | undefined
+): ServicesLayoutOption {
+  const val = group?.layout;
+  if (
+    typeof val === "string" &&
+    SERVICES_LAYOUT_VALUES.includes(val as ServicesLayoutOption)
+  ) {
+    return val as ServicesLayoutOption;
+  }
+  return "accordion";
 }
 
 function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
@@ -78,6 +93,7 @@ function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
       readSettingText(seo, "schema_type", "Organization") || "Organization",
     seo_google_verification: readSettingText(seo, "google_verification"),
     seo_robots_index: readSettingBoolean(seo, "robots_index", true),
+    services_layout: readServicesLayout(settings.services),
   };
 }
 

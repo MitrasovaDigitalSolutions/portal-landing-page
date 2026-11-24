@@ -5,6 +5,7 @@ import { FormDialogFooter } from "@/components/forms/form-dialog-footer";
 import { FormFeatureList } from "@/components/forms/form-feature-list";
 import { FormImageUpload } from "@/components/forms/form-image-upload";
 import { FormInput } from "@/components/forms/form-input";
+import { FormInputNumber } from "@/components/forms/form-input-number";
 import { FormInputOption } from "@/components/forms/form-input-option";
 import { FormInputStepper } from "@/components/forms/form-input-stepper";
 import { FormRichText } from "@/components/forms/form-rich-text";
@@ -27,17 +28,36 @@ interface ServiceFormDialogProps {
   types: ServiceType[];
 }
 
+function normalizeOptionalRichText(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return "";
+  }
+  const textOnly = trimmed
+    .replaceAll(/<br\s*\/?>/gi, "")
+    .replaceAll(/<\/?p>/gi, "")
+    .replaceAll(/&nbsp;/gi, " ")
+    .trim();
+  return textOnly.length > 0 ? trimmed : "";
+}
+
 function buildServiceFormData(values: ServiceFormValues): FormData {
   const cleanedFeatures = values.features
     .map((item) => item.trim())
     .filter(Boolean);
+  const priceText =
+    values.price !== null && Number.isFinite(values.price)
+      ? String(Math.trunc(values.price))
+      : "";
 
   return new FormDataBuilder()
     .appendText("name", values.name.trim())
     .appendText("slug", values.slug.trim())
     .appendText("service_type_id", values.service_type_id)
     .appendText("short_desc", values.short_desc.trim())
-    .appendText("body", values.body.trim())
+    .appendOptionalText("price", priceText)
+    .appendOptionalText("price_note", values.price_note.trim())
+    .appendOptionalText("body", normalizeOptionalRichText(values.body))
     .appendNumber("order", values.order)
     .appendBoolean("is_active", values.is_active)
     .appendBoolean("is_featured", values.is_featured)
@@ -57,6 +77,8 @@ function getInitialValues(
     slug: service?.slug ?? "",
     service_type_id: service ? String(service.service_type_id) : fallbackTypeId,
     short_desc: service?.short_desc ?? "",
+    price: service?.price ?? null,
+    price_note: service?.price_note ?? "",
     body: service?.body ?? "",
     features: service?.features ?? [],
     order: service?.order ?? 1,
@@ -136,7 +158,28 @@ export function ServiceFormDialog({
           </div>
 
           <FormTextarea<ServiceFormValues> name="short_desc" label="Ringkasan Singkat" placeholder="Deskripsi 1-2 kalimat untuk kartu layanan..." rows={2} maxLength={300} required />
-          <FormRichText<ServiceFormValues> name="body" label="Deskripsi Lengkap" placeholder="Jelaskan detail produk/layanan secara komprehensif..." />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormInputNumber<ServiceFormValues>
+              name="price"
+              label="Harga (Opsional)"
+              leftAddon="Rp"
+              thousandSeparator
+              min={0}
+              fallbackValue={null}
+              placeholder="75.000"
+              helperText="Kosongkan bila tanpa harga."
+            />
+            <FormInput<ServiceFormValues>
+              name="price_note"
+              label="Keterangan Harga"
+              placeholder="/pcs"
+              maxLength={30}
+              helperText="Contoh: /pcs, per lusin, mulai dari."
+            />
+          </div>
+
+          <FormRichText<ServiceFormValues> name="body" label="Deskripsi Lengkap (Opsional)" placeholder="Jelaskan detail produk/layanan secara komprehensif..." />
           <FormFeatureList<ServiceFormValues> name="features" label="Fitur & Keunggulan Layanan" helperText="Tekan Enter atau klik Tambah Poin untuk menambahkan daftar fitur." />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

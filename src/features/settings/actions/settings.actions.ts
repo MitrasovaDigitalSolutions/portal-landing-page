@@ -50,6 +50,11 @@ function buildBulkPayload(values: SettingsFormValues): SettingsBulkPayload {
         value: values.seo_robots_index ? "true" : "false",
       },
       {
+        group: "services",
+        key: "layout",
+        value: values.services_layout,
+      },
+      {
         group: "modules",
         key: "is_active",
         value: {

@@ -2,6 +2,7 @@
 
 import {
   Building2,
+  LayoutGrid,
   Loader2,
   PhoneCall,
   Save,
@@ -13,6 +14,7 @@ import { FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SettingsContactTab } from "@/features/settings/components/settings-contact-tab";
+import { SettingsDisplayTab } from "@/features/settings/components/settings-display-tab";
 import { SettingsGeneralTab } from "@/features/settings/components/settings-general-tab";
 import { SettingsModulesTab } from "@/features/settings/components/settings-modules-tab";
 import { SettingsSeoTab } from "@/features/settings/components/settings-seo-tab";
@@ -64,6 +66,10 @@ export function SettingsForm({
               <SlidersHorizontal className="size-3.5" />
               <span>Visibilitas Modul</span>
             </TabsTrigger>
+            <TabsTrigger value="display" className="gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold">
+              <LayoutGrid className="size-3.5" />
+              <span>Tampilan Layanan</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="mt-0">
@@ -84,6 +90,10 @@ export function SettingsForm({
 
           <TabsContent value="modules" className="mt-0">
             <SettingsModulesTab />
+          </TabsContent>
+
+          <TabsContent value="display" className="mt-0">
+            <SettingsDisplayTab />
           </TabsContent>
         </Tabs>
 

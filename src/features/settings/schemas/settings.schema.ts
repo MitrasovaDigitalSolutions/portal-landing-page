@@ -3,6 +3,14 @@ import type { TenantModulesState } from "@/config/modules";
 
 const HEX_COLOR_PATTERN = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
 
+export const SERVICES_LAYOUT_VALUES = [
+  "accordion",
+  "carousel",
+  "grid",
+] as const;
+
+export type ServicesLayoutOption = (typeof SERVICES_LAYOUT_VALUES)[number];
+
 export const settingsFormSchema = z.object({
   site_title: z.string().trim().max(150, "Nama situs maksimal 150 karakter."),
   tagline: z.string().trim().max(255, "Tagline maksimal 255 karakter."),
@@ -61,6 +69,7 @@ export const settingsFormSchema = z.object({
     .trim()
     .max(200, "Kode verifikasi terlalu panjang."),
   seo_robots_index: z.boolean(),
+  services_layout: z.enum(SERVICES_LAYOUT_VALUES),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsFormSchema>;

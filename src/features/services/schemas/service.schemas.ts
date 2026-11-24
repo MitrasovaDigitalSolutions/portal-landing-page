@@ -19,6 +19,8 @@ export interface ServiceFormValues {
   slug: string;
   service_type_id: string;
   short_desc: string;
+  price: number | null;
+  price_note: string;
   body: string;
   features: string[];
   order: number;

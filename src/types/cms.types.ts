@@ -49,12 +49,14 @@ export interface ServiceItem {
   name: string;
   slug: string;
   short_desc: string;
-  body: string;
+  body: string | null;
   icon_path: string | null;
   thumbnail_path: string | null;
   icon_url: string | null;
   thumbnail_url: string | null;
   features: string[] | null;
+  price: number | null;
+  price_note: string | null;
   is_featured: boolean;
   is_active: boolean;
   order: number;

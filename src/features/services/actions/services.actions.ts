@@ -75,13 +75,12 @@ export async function saveServiceAction(
   const name = readFormString(formData, "name");
   const serviceTypeId = readFormString(formData, "service_type_id");
   const shortDesc = readFormString(formData, "short_desc");
-  const body = readFormString(formData, "body");
 
-  if (!name || !serviceTypeId || !shortDesc || !body) {
+  if (!name || !serviceTypeId || !shortDesc) {
     return {
       success: false,
       message:
-        "Nama layanan, tipe layanan, ringkasan singkat, dan deskripsi lengkap wajib diisi.",
+        "Nama layanan, tipe layanan, dan ringkasan singkat wajib diisi.",
     };
   }
 
