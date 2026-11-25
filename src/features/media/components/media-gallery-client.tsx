@@ -25,9 +25,10 @@ import {
   extractMediaFilename,
   formatMediaDirLabel,
   formatMediaSize,
+  toAbsoluteProxyUrl,
+  toMediaProxyPath,
 } from "@/features/media/utils/media-format";
 import type { MediaItem } from "@/types/cms.types";
-import { resolveMediaUrl } from "@/utils/media";
 
 interface MediaGalleryClientProps {
   items: MediaItem[];
@@ -86,7 +87,7 @@ export function MediaGalleryClient({
   const slides = React.useMemo(
     () =>
       filteredItems.map((item) => ({
-        src: resolveMediaUrl(item.url, item.path) ?? item.url,
+        src: toMediaProxyPath(item),
         title: extractMediaFilename(item.path),
         description: `${formatMediaDirLabel(extractMediaDir(item.path))} · ${formatMediaSize(item.size)} · ${item.path}`,
       })),
@@ -100,7 +101,7 @@ export function MediaGalleryClient({
 
   const handleCopyUrl = (item: MediaItem): void => {
     void navigator.clipboard
-      .writeText(item.url)
+      .writeText(toAbsoluteProxyUrl(item))
       .then(() => toast.success("URL gambar disalin ke clipboard."))
       .catch(() => toast.error("Gagal menyalin URL gambar."));
   };

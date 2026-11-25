@@ -7,7 +7,10 @@ import { BaseDialog } from "@/components/ui/base-dialog";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { replaceMediaAction } from "@/features/media/actions/media.actions";
-import { extractMediaFilename } from "@/features/media/utils/media-format";
+import {
+  extractMediaFilename,
+  toMediaProxyPath,
+} from "@/features/media/utils/media-format";
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
 import { queryKeys } from "@/lib/query-keys";
 import { useTenant } from "@/providers/tenant-provider";
@@ -71,7 +74,7 @@ export function MediaReplaceDialog({
           <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
             <div className="relative size-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white">
               <SmartImage
-                src={item.url}
+                src={toMediaProxyPath(item)}
                 fallbackPath={item.path}
                 alt={extractMediaFilename(item.path)}
                 fill

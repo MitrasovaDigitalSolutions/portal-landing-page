@@ -1,4 +1,5 @@
-import type { MediaUsageRef } from "@/types/cms.types";
+import type { MediaItem, MediaUsageRef } from "@/types/cms.types";
+import { MEDIA_PROXY_PREFIX } from "@/utils/media";
 
 const DIR_LABEL_MAP: Record<string, string> = {
   services: "Produk & Layanan",
@@ -85,4 +86,29 @@ export function resolveUsageMeta(ref: MediaUsageRef): {
     default:
       return { typeLabel, href: "/" };
   }
+}
+
+export function toMediaProxyPath(
+  item: Pick<MediaItem, "path" | "url">
+): string {
+  const cleanPath = item.path.replace(/^\/+/, "");
+  let search = "";
+  if (item.url) {
+    try {
+      search = new URL(item.url, "http://placeholder.local").search;
+    } catch {
+      search = "";
+    }
+  }
+  return `${MEDIA_PROXY_PREFIX}/${cleanPath}${search}`;
+}
+
+export function toAbsoluteProxyUrl(
+  item: Pick<MediaItem, "path" | "url">
+): string {
+  const proxyPath = toMediaProxyPath(item);
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}${proxyPath}`;
+  }
+  return proxyPath;
 }

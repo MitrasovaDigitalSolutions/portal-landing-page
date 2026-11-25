@@ -9,6 +9,7 @@ import {
   extractMediaFilename,
   formatMediaDirLabel,
   formatMediaSize,
+  toMediaProxyPath,
 } from "@/features/media/utils/media-format";
 import type { MediaItem } from "@/types/cms.types";
 import { formatDateId } from "@/utils/format-date";
@@ -46,7 +47,7 @@ export function MediaListRow({
           className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
         >
           <SmartImage
-            src={item.url}
+            src={toMediaProxyPath(item)}
             fallbackPath={item.path}
             alt={filename}
             fill

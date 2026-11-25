@@ -74,7 +74,7 @@ export function buildServiceColumns(
     },
     {
       accessorKey: "price",
-      header: "Harga",
+      header: "Harga Mulai",
       meta: { cellClassName: "tabular-nums whitespace-nowrap" },
       cell: ({ row }) => {
         const formatted = formatServicePrice(row.original.price);

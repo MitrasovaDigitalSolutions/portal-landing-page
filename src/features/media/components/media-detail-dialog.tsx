@@ -8,10 +8,10 @@ import { MediaUsageList } from "@/features/media/components/media-usage-list";
 import {
   extractMediaFilename,
   formatMediaSize,
+  toMediaProxyPath,
 } from "@/features/media/utils/media-format";
 import type { MediaItem } from "@/types/cms.types";
 import { formatDateId } from "@/utils/format-date";
-import { resolveMediaUrl } from "@/utils/media";
 
 interface MediaDetailDialogProps {
   item: MediaItem | null;
@@ -31,7 +31,7 @@ export function MediaDetailDialog({
   onDelete,
 }: MediaDetailDialogProps): React.JSX.Element {
   const filename = item ? extractMediaFilename(item.path) : "";
-  const previewUrl = item ? resolveMediaUrl(item.url, item.path) : null;
+  const previewUrl = item ? toMediaProxyPath(item) : null;
 
   return (
     <BaseDialog
@@ -45,7 +45,7 @@ export function MediaDetailDialog({
         <div className="space-y-5">
           <div className="relative flex h-56 w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100/80 sm:h-64">
             <SmartImage
-              src={item.url}
+              src={previewUrl}
               fallbackPath={item.path}
               alt={filename}
               fill
