@@ -1,6 +1,7 @@
 "use client";
 
 import { Layers, Plus } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/portal/confirm-dialog";
 import { Button } from "@/components/ui/button";
@@ -9,32 +10,33 @@ import { deleteSectionAction } from "@/features/pages/actions/pages.actions";
 import { PageFormDialog } from "@/features/pages/components/page-form-dialog";
 import { PageSectionCard } from "@/features/pages/components/page-section-card";
 import { PageSectionsHeader } from "@/features/pages/components/page-sections-header";
-import { SectionFormDialog } from "@/features/pages/components/section-form-dialog";
+import { useSectionTypes } from "@/features/pages/hooks/use-section-types";
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
 import { useDeleteConfirm } from "@/hooks/use-delete-confirm";
 import { queryKeys } from "@/lib/query-keys";
 import { useTenant } from "@/providers/tenant-provider";
-import type { PageDetail, PageSection } from "@/types/cms.types";
+import type {
+  PageDetail,
+  PageSection,
+  SectionTypeDefinition,
+} from "@/types/cms.types";
 
 interface PageSectionsManagerProps {
   page: PageDetail;
+  initialSectionTypes?: SectionTypeDefinition[];
 }
 
 export function PageSectionsManager({
   page,
+  initialSectionTypes,
 }: PageSectionsManagerProps): React.JSX.Element {
   const { activeSite } = useTenant();
   const siteKey = activeSite?.slug ?? "default";
   const [pageDialogOpen, setPageDialogOpen] = useState(false);
-  const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
-  const [selectedSection, setSelectedSection] = useState<PageSection | null>(
-    null
-  );
   const deleteConfirm = useDeleteConfirm<PageSection>();
+  const { data: sectionTypes = [] } = useSectionTypes(initialSectionTypes);
 
   const sortedSections = [...page.sections].sort((a, b) => a.order - b.order);
-  const lastSection = sortedSections.at(-1);
-  const nextOrder = lastSection ? lastSection.order + 1 : 0;
 
   const deleteMutation = useCrudMutation({
     mutationFn: (sectionId: number) => deleteSectionAction(sectionId, page.id),
@@ -47,11 +49,6 @@ export function PageSectionsManager({
     },
   });
 
-  const handleOpenCreateSection = (): void => {
-    setSelectedSection(null);
-    setSectionDialogOpen(true);
-  };
-
   return (
     <div className="space-y-5">
       <PageSectionsHeader
@@ -59,7 +56,6 @@ export function PageSectionsManager({
         onEditPage={() => {
           setPageDialogOpen(true);
         }}
-        onAddSection={handleOpenCreateSection}
       />
 
       {sortedSections.length > 0 ? (
@@ -67,11 +63,9 @@ export function PageSectionsManager({
           {sortedSections.map((section) => (
             <PageSectionCard
               key={section.id}
+              pageId={page.id}
               section={section}
-              onEdit={(target) => {
-                setSelectedSection(target);
-                setSectionDialogOpen(true);
-              }}
+              sectionTypes={sectionTypes}
               onDelete={(target) => {
                 deleteConfirm.requestDelete(target);
               }}
@@ -92,7 +86,8 @@ export function PageSectionsManager({
           </p>
           <Button
             size="sm"
-            onClick={handleOpenCreateSection}
+            nativeButton={false}
+            render={<Link href={`/pages/${page.id}/sections/create`} />}
             className="mt-2 gap-1.5 rounded-xl text-xs font-semibold"
           >
             <Plus className="size-4" />
@@ -105,15 +100,6 @@ export function PageSectionsManager({
         page={page}
         open={pageDialogOpen}
         onOpenChange={setPageDialogOpen}
-      />
-
-      <SectionFormDialog
-        pageId={page.id}
-        pageSlug={page.slug}
-        section={selectedSection}
-        defaultOrder={nextOrder}
-        open={sectionDialogOpen}
-        onOpenChange={setSectionDialogOpen}
       />
 
       <ConfirmDialog

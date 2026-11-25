@@ -1,17 +1,20 @@
 "use client";
 
 import { Edit2, Image as ImageIcon, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { SmartImage } from "@/components/shared/smart-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import type { PageSection } from "@/types/cms.types";
+import { resolveSectionType } from "@/features/pages/utils/section-payload";
+import type { PageSection, SectionTypeDefinition } from "@/types/cms.types";
 import { resolveMediaUrl } from "@/utils/media";
 
 interface PageSectionCardProps {
+  pageId: number;
   section: PageSection;
-  onEdit: (section: PageSection) => void;
+  sectionTypes?: readonly SectionTypeDefinition[];
   onDelete: (section: PageSection) => void;
 }
 
@@ -32,12 +35,15 @@ function summarizePayloadKeys(
 }
 
 export function PageSectionCard({
+  pageId,
   section,
-  onEdit,
+  sectionTypes = [],
   onDelete,
 }: PageSectionCardProps): React.JSX.Element {
   const imageUrl = resolveMediaUrl(section.image_url, section.image_path);
   const payloadKeys = summarizePayloadKeys(section.payload);
+  const resolvedType = resolveSectionType(sectionTypes, section.key);
+  const isUnknownType = sectionTypes.length > 0 && !resolvedType;
 
   return (
     <Card className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs transition-colors hover:border-slate-300 sm:p-5">
@@ -47,9 +53,14 @@ export function PageSectionCard({
             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 tabular-nums">
               #{section.order}
             </span>
+            {resolvedType ? (
+              <Badge variant="outline" className="rounded-md text-[10px]">
+                {resolvedType.name}
+              </Badge>
+            ) : null}
             <Badge
-              variant="secondary"
-              className="rounded-md font-mono text-[10px] font-bold text-primary"
+              variant={isUnknownType ? "warning" : "secondary"}
+              className="rounded-md font-mono text-[10px] font-bold"
             >
               {section.key}
             </Badge>
@@ -70,13 +81,11 @@ export function PageSectionCard({
 
         <div className="flex shrink-0 items-center gap-1">
           <Button
-            type="button"
             variant="ghost"
             size="icon-sm"
+            nativeButton={false}
             aria-label={`Edit section ${section.key}`}
-            onClick={() => {
-              onEdit(section);
-            }}
+            render={<Link href={`/pages/${pageId}/sections/${section.id}/edit`} />}
             className="text-amber-600 hover:bg-amber-50 hover:text-amber-700"
           >
             <Edit2 className="size-4" />

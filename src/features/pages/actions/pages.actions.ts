@@ -128,17 +128,56 @@ export async function saveSectionJsonAction(
   }
 
   return withTenantAction(async ({ siteKey }) => {
-    const data = sectionId
-      ? await pagesRepository.updateSection(sectionId, parsed.data, siteKey)
-      : await pagesRepository.createSection(pageId, parsed.data, siteKey);
+    const envelope = sectionId
+      ? await pagesRepository.updateSectionWithMeta(
+          sectionId,
+          parsed.data,
+          siteKey
+        )
+      : await pagesRepository.createSectionWithMeta(
+          pageId,
+          parsed.data,
+          siteKey
+        );
 
-    revalidatePortalPaths(["/pages", `/pages/${pageId}`]);
+    revalidatePortalPaths(["/pages", `/pages/${pageId}`, "/media"]);
     return {
       success: true,
-      data,
+      data: envelope.data,
+      warnings: envelope.warnings,
       message: sectionId
         ? "Section halaman berhasil diperbarui."
         : "Section baru berhasil ditambahkan.",
+    };
+  });
+}
+
+export async function uploadSectionImageAction(
+  pageId: number,
+  sectionId: number,
+  formData: FormData
+): Promise<ActionResult<PageSection>> {
+  const image = formData.get("image");
+  if (!(image instanceof File) || image.size === 0) {
+    return {
+      success: false,
+      message: "File gambar section tidak valid.",
+    };
+  }
+
+  return withTenantAction(async ({ siteKey }) => {
+    const envelope = await pagesRepository.updateSectionWithMeta(
+      sectionId,
+      formData,
+      siteKey
+    );
+
+    revalidatePortalPaths(["/pages", `/pages/${pageId}`, "/media"]);
+    return {
+      success: true,
+      data: envelope.data,
+      warnings: envelope.warnings,
+      message: "Section & gambar berhasil disimpan.",
     };
   });
 }

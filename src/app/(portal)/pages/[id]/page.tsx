@@ -4,8 +4,10 @@ import { NoTenantState } from "@/components/portal/no-tenant-state";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { PageSectionsManager } from "@/features/pages/components/page-sections-manager";
 import { pagesRepository } from "@/features/pages/repositories/pages.repository";
+import { sectionTypesRepository } from "@/features/pages/repositories/section-types.repository";
 import { getPortalSession } from "@/lib/auth/auth";
 import { resolveActiveSiteContext } from "@/lib/tenant/active-tenant";
+import type { SectionTypeDefinition } from "@/types/cms.types";
 
 export const metadata: Metadata = {
   title: "Kelola Section Halaman",
@@ -36,17 +38,23 @@ export default async function PageDetailPage({
     );
   }
 
-  let pageDetail: Awaited<ReturnType<typeof pagesRepository.getById>> | null =
-    null;
-  try {
-    pageDetail = await pagesRepository.getById(pageId, siteContext.activeSiteKey);
-  } catch {
-    pageDetail = null;
-  }
+  const [pageRes, typesRes] = await Promise.allSettled([
+    pagesRepository.getById(pageId, siteContext.activeSiteKey),
+    sectionTypesRepository.list(siteContext.activeSiteKey),
+  ]);
+
+  const pageDetail = pageRes.status === "fulfilled" ? pageRes.value : null;
+  const sectionTypes: SectionTypeDefinition[] =
+    typesRes.status === "fulfilled" ? typesRes.value : [];
 
   if (!pageDetail) {
     notFound();
   }
 
-  return <PageSectionsManager page={pageDetail} />;
+  return (
+    <PageSectionsManager
+      page={pageDetail}
+      initialSectionTypes={sectionTypes}
+    />
+  );
 }

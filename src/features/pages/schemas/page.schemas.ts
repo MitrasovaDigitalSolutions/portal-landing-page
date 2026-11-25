@@ -79,6 +79,7 @@ export interface SectionFormValues {
   title: string;
   subtitle: string;
   body: string;
+  payload: Record<string, unknown>;
   payload_json: string;
   is_active: boolean;
   image: File | null;

@@ -2,6 +2,7 @@ import { ApiError } from "@/lib/api-error";
 import { getPortalSession } from "@/lib/auth/auth";
 import { apiClient, type QueryParamValue } from "@/lib/http/api-client";
 import { resolveActiveSiteContext } from "@/lib/tenant/active-tenant";
+import type { ApiEnvelopeResult } from "@/types/http.types";
 
 interface RequestConfig {
   query?: Record<string, QueryParamValue>;
@@ -133,6 +134,22 @@ export const portalApi = {
     });
   },
 
+  async tenantPostWithMeta<T>(
+    path: string,
+    body: unknown,
+    config?: RequestConfig
+  ): Promise<ApiEnvelopeResult<T>> {
+    const { token, siteKey } = await resolveTenantAuth(config);
+    return apiClient.postWithMeta<T>(path, body, {
+      scope: "tenant",
+      token,
+      siteKey,
+      query: config?.query,
+      headers: config?.headers,
+      signal: config?.signal,
+    });
+  },
+
   async tenantPut<T>(
     path: string,
     body: unknown,
@@ -140,6 +157,22 @@ export const portalApi = {
   ): Promise<T> {
     const { token, siteKey } = await resolveTenantAuth(config);
     return apiClient.put<T>(path, body, {
+      scope: "tenant",
+      token,
+      siteKey,
+      query: config?.query,
+      headers: config?.headers,
+      signal: config?.signal,
+    });
+  },
+
+  async tenantPutWithMeta<T>(
+    path: string,
+    body: unknown,
+    config?: RequestConfig
+  ): Promise<ApiEnvelopeResult<T>> {
+    const { token, siteKey } = await resolveTenantAuth(config);
+    return apiClient.putWithMeta<T>(path, body, {
       scope: "tenant",
       token,
       siteKey,

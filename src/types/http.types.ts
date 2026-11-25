@@ -2,7 +2,14 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data: T;
+  warnings?: string[];
   errors?: Record<string, string[]>;
+}
+
+export interface ApiEnvelopeResult<T> {
+  data: T;
+  warnings: string[];
+  message?: string;
 }
 
 export interface PaginationMeta {
@@ -22,6 +29,7 @@ export type ActionResult<T = undefined> =
   | {
       success: true;
       message?: string;
+      warnings?: string[];
       data: T;
     }
   | {

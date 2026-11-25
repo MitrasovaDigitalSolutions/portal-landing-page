@@ -1,6 +1,6 @@
 import { env } from "@/config/env";
 import { ApiError } from "@/lib/api-error";
-import type { ApiResponse } from "@/types/http.types";
+import type { ApiEnvelopeResult, ApiResponse } from "@/types/http.types";
 
 export type ApiScope = "global" | "tenant";
 
@@ -89,12 +89,40 @@ function unwrapPayload(status: number, payload: unknown): unknown {
   return payload;
 }
 
-async function executeRequest<T>(
+function unwrapEnvelope<T>(
+  status: number,
+  payload: unknown
+): ApiEnvelopeResult<T> {
+  if (payload && typeof payload === "object") {
+    const wrapped = payload as Partial<ApiResponse<unknown>>;
+    if (wrapped.success === false) {
+      throw ApiError.fromPayload(status || 400, payload);
+    }
+    const rawWarnings: unknown = wrapped.warnings;
+    const warnings = Array.isArray(rawWarnings)
+      ? rawWarnings.filter((w): w is string => typeof w === "string" && w.length > 0)
+      : [];
+    const data = (
+      wrapped.data !== undefined ? wrapped.data : payload
+    ) as T;
+    return {
+      data,
+      warnings,
+      message: typeof wrapped.message === "string" ? wrapped.message : undefined,
+    };
+  }
+  return {
+    data: payload as T,
+    warnings: [],
+  };
+}
+
+async function performFetch(
   method: string,
   path: string,
   body: unknown,
   options: ApiRequestOptions
-): Promise<T> {
+): Promise<{ status: number; payload: unknown }> {
   const isFormData = body instanceof FormData;
   const hasJsonBody = body !== undefined && !isFormData;
   const headers = buildHeaders(options, hasJsonBody);
@@ -131,7 +159,27 @@ async function executeRequest<T>(
     throw ApiError.fromPayload(response.status, payload);
   }
 
-  return unwrapPayload(response.status, payload) as T;
+  return { status: response.status, payload };
+}
+
+async function executeRequest<T>(
+  method: string,
+  path: string,
+  body: unknown,
+  options: ApiRequestOptions
+): Promise<T> {
+  const { status, payload } = await performFetch(method, path, body, options);
+  return unwrapPayload(status, payload) as T;
+}
+
+async function executeEnvelopeRequest<T>(
+  method: string,
+  path: string,
+  body: unknown,
+  options: ApiRequestOptions
+): Promise<ApiEnvelopeResult<T>> {
+  const { status, payload } = await performFetch(method, path, body, options);
+  return unwrapEnvelope<T>(status, payload);
 }
 
 export const apiClient = {
@@ -147,12 +195,28 @@ export const apiClient = {
     return executeRequest<T>("POST", path, body, options);
   },
 
+  postWithMeta<T>(
+    path: string,
+    body: unknown,
+    options: ApiRequestOptions
+  ): Promise<ApiEnvelopeResult<T>> {
+    return executeEnvelopeRequest<T>("POST", path, body, options);
+  },
+
   put<T>(
     path: string,
     body: unknown,
     options: ApiRequestOptions
   ): Promise<T> {
     return executeRequest<T>("PUT", path, body, options);
+  },
+
+  putWithMeta<T>(
+    path: string,
+    body: unknown,
+    options: ApiRequestOptions
+  ): Promise<ApiEnvelopeResult<T>> {
+    return executeEnvelopeRequest<T>("PUT", path, body, options);
   },
 
   patch<T>(

@@ -11,13 +11,11 @@ import type { PageDetail } from "@/types/cms.types";
 interface PageSectionsHeaderProps {
   page: PageDetail;
   onEditPage: () => void;
-  onAddSection: () => void;
 }
 
 export function PageSectionsHeader({
   page,
   onEditPage,
-  onAddSection,
 }: PageSectionsHeaderProps): React.JSX.Element {
   return (
     <>
@@ -64,7 +62,8 @@ export function PageSectionsHeader({
 
             <Button
               size="sm"
-              onClick={onAddSection}
+              nativeButton={false}
+              render={<Link href={`/pages/${page.id}/sections/create`} />}
               className="h-9 gap-1.5 rounded-xl px-3.5 text-xs font-semibold shadow-xs"
             >
               <Plus className="size-4" />

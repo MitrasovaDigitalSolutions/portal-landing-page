@@ -1,7 +1,7 @@
 import { portalApi } from "@/lib/http/portal-api";
 import { normalizeListResponse } from "@/lib/http/pagination";
 import type { PageDetail, PageSection, PageSummary } from "@/types/cms.types";
-import type { PaginatedResponse } from "@/types/http.types";
+import type { ApiEnvelopeResult, PaginatedResponse } from "@/types/http.types";
 
 export interface UpsertPagePayload {
   title: string;
@@ -61,6 +61,30 @@ export const pagesRepository = {
     return portalApi.tenantPut<PageSection>(`/admin/sections/${sectionId}`, body, {
       siteKey,
     });
+  },
+
+  createSectionWithMeta(
+    pageId: number,
+    body: FormData | Record<string, unknown>,
+    siteKey?: string
+  ): Promise<ApiEnvelopeResult<PageSection>> {
+    return portalApi.tenantPostWithMeta<PageSection>(
+      `/admin/pages/${pageId}/sections`,
+      body,
+      { siteKey }
+    );
+  },
+
+  updateSectionWithMeta(
+    sectionId: number,
+    body: FormData | Record<string, unknown>,
+    siteKey?: string
+  ): Promise<ApiEnvelopeResult<PageSection>> {
+    return portalApi.tenantPutWithMeta<PageSection>(
+      `/admin/sections/${sectionId}`,
+      body,
+      { siteKey }
+    );
   },
 
   deleteSection(sectionId: number, siteKey?: string): Promise<undefined> {

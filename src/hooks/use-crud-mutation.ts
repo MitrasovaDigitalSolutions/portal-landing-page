@@ -46,6 +46,9 @@ export function useCrudMutation<TVariables, TData = undefined>({
           if (message) {
             toast.success(message);
           }
+          for (const warning of result.warnings ?? []) {
+            toast.warning(warning);
+          }
         }
 
         if (invalidateKeys) {

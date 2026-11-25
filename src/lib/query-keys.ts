@@ -15,6 +15,9 @@ export const queryKeys = {
     detail: (siteKey: string, id: string | number) =>
       ["pages", siteKey, String(id)] as const,
   },
+  sectionTypes: {
+    all: (siteKey: string) => ["section-types", siteKey] as const,
+  },
   services: {
     all: (siteKey: string) => ["services", siteKey] as const,
   },

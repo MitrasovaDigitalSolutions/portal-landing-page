@@ -218,6 +218,47 @@ export interface ReplaceMediaResult {
   references_updated: number;
 }
 
+export type SectionFieldType =
+  | "text"
+  | "textarea"
+  | "richtext"
+  | "url"
+  | "image"
+  | "number"
+  | "boolean"
+  | "select"
+  | "list"
+  | "group"
+  | "repeater";
+
+export interface SectionFieldSchema {
+  name: string;
+  label: string;
+  type: SectionFieldType;
+  required?: boolean;
+  max?: number;
+  rows?: number;
+  options?: string[];
+  fields?: SectionFieldSchema[];
+}
+
+export interface SectionTypeDefinition {
+  id: number;
+  key: string;
+  name: string;
+  description: string | null;
+  fields: SectionFieldSchema[];
+  aliases: string[] | null;
+  is_active: boolean;
+}
+
+export interface UploadedMediaResult {
+  path: string;
+  url: string;
+  size: number;
+  modified_at: string;
+}
+
 export interface DeleteMediaResult {
   path: string;
   usage: MediaUsageRef[];
