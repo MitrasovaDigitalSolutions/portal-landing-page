@@ -32,6 +32,7 @@ export interface TenantDashboardOverview {
 export interface PortalSiteSettingsSummary {
   siteTitle?: string;
   logoUrl?: string;
+  brandColor?: string;
   modules: TenantModulesState;
   rawSettings: RawSettingsMap;
 }

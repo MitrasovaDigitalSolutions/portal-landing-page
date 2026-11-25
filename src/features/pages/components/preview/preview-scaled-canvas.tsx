@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 interface PreviewScaledCanvasProps {
   viewport: "desktop" | "mobile";
   onScaleChange?: (percent: number) => void;
+  canvasStyle?: React.CSSProperties;
   children: React.ReactNode;
 }
 
 export function PreviewScaledCanvas({
   viewport,
   onScaleChange,
+  canvasStyle,
   children,
 }: PreviewScaledCanvasProps): React.JSX.Element {
   const targetWidth = viewport === "mobile" ? 390 : 960;
@@ -92,6 +94,7 @@ export function PreviewScaledCanvas({
             : "rounded-xl border border-slate-200/90 shadow-sm"
         )}
         style={{
+          ...canvasStyle,
           width: `${targetWidth}px`,
           transform: scale < 1 ? `scale(${scale})` : undefined,
           transformOrigin: "top left",

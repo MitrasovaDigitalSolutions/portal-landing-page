@@ -40,6 +40,7 @@ export async function getTenantSettingsSummary(
     return {
       siteTitle: readStringField(general, "site_title"),
       logoUrl: readStringField(general, "logo_url"),
+      brandColor: readStringField(general, "brand_color"),
       modules: extractModulesState(rawSettings),
       rawSettings,
     };

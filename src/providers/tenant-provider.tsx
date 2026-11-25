@@ -11,6 +11,7 @@ export interface TenantContextValue {
   modules: TenantModulesState;
   siteTitle?: string;
   logoUrl?: string;
+  brandColor?: string;
 }
 
 const TenantContext = createContext<TenantContextValue>({

@@ -33,6 +33,7 @@ export default async function PortalLayout({
         modules: settings.modules,
         siteTitle: settings.siteTitle,
         logoUrl: settings.logoUrl,
+        brandColor: settings.brandColor,
       }}
     >
       <div className="flex min-h-screen w-full bg-slate-50 text-slate-900">

@@ -17,6 +17,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useTenant } from "@/providers/tenant-provider";
 import type { PageDetail, PageSection } from "@/types/cms.types";
+import {
+  generatePreviewBrandStyle,
+  resolveSiteBrandColor,
+} from "@/utils/color";
 import { resolveMediaUrl } from "@/utils/media";
 
 interface SectionPreviewFrameProps {
@@ -41,7 +45,7 @@ export function SectionPreviewFrame({
     url: string;
   } | null>(null);
 
-  const { activeSite, siteTitle } = useTenant();
+  const { activeSite, siteTitle, brandColor } = useTenant();
   const { control } = useFormContext<SectionFormValues>();
 
   const watchedKey = useWatch({ control, name: "key" });
@@ -70,6 +74,11 @@ export function SectionPreviewFrame({
   }
 
   const domain = activeSite?.slug ?? "landing-page";
+  const resolvedBrandColor = resolveSiteBrandColor(brandColor, activeSite?.slug);
+  const previewBrandStyle = React.useMemo(
+    () => generatePreviewBrandStyle(resolvedBrandColor),
+    [resolvedBrandColor]
+  );
   const previewData: SectionPreviewData = {
     key: watchedKey,
     title: watchedTitle,
@@ -93,6 +102,7 @@ export function SectionPreviewFrame({
         pageSlug={page.slug}
         sectionKey={watchedKey}
         zoomPercent={zoomPercent}
+        brandColor={resolvedBrandColor}
         viewport={viewport}
         onViewportChange={setViewport}
         fullWidth={fullWidth}
@@ -113,7 +123,11 @@ export function SectionPreviewFrame({
           isMobile && "bg-slate-200/70"
         )}
       >
-        <PreviewScaledCanvas viewport={viewport} onScaleChange={setZoomPercent}>
+        <PreviewScaledCanvas
+          viewport={viewport}
+          onScaleChange={setZoomPercent}
+          canvasStyle={previewBrandStyle}
+        >
           <SectionPreviewRenderer data={previewData} compact={isMobile} />
         </PreviewScaledCanvas>
       </div>

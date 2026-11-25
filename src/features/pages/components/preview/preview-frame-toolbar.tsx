@@ -12,6 +12,7 @@ interface PreviewFrameToolbarProps {
   pageSlug: string;
   sectionKey: string;
   zoomPercent: number;
+  brandColor?: string;
   viewport: PreviewViewport;
   onViewportChange: (viewport: PreviewViewport) => void;
   fullWidth: boolean;
@@ -23,6 +24,7 @@ export function PreviewFrameToolbar({
   pageSlug,
   sectionKey,
   zoomPercent,
+  brandColor,
   viewport,
   onViewportChange,
   fullWidth,
@@ -39,6 +41,13 @@ export function PreviewFrameToolbar({
         >
           Live
         </Badge>
+        {brandColor ? (
+          <span
+            className="size-2.5 shrink-0 rounded-full ring-1 ring-slate-900/15"
+            style={{ backgroundColor: brandColor }}
+            title={`Warna tema web: ${brandColor}`}
+          />
+        ) : null}
         <span className="truncate font-mono text-[10px] text-slate-500">
           {domain}/{pageSlug}
           {sectionKey ? `#${sectionKey}` : ""}
