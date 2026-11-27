@@ -12,6 +12,13 @@ export const SERVICES_LAYOUT_VALUES = [
 export type ServicesLayoutOption = (typeof SERVICES_LAYOUT_VALUES)[number];
 
 export const settingsFormSchema = z.object({
+  logo: z
+    .custom<File | null>(
+      (val) => val === null || val instanceof File,
+      "Format file logo tidak valid."
+    )
+    .nullable()
+    .optional(),
   site_title: z.string().trim().max(150, "Nama situs maksimal 150 karakter."),
   tagline: z.string().trim().max(255, "Tagline maksimal 255 karakter."),
   meta_keywords: z.string().trim().max(500, "Kata kunci terlalu panjang."),
@@ -46,6 +53,7 @@ export const settingsFormSchema = z.object({
   modules_careers: z.boolean(),
   modules_news: z.boolean(),
   modules_contact: z.boolean(),
+  extra_pages_active: z.record(z.string(), z.boolean()),
   seo_meta_title: z.string().trim().max(150, "Judul SEO maksimal 150 karakter."),
   seo_meta_description: z
     .string()

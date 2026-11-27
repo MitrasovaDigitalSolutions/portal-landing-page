@@ -13,4 +13,15 @@ export const settingsRepository = {
   ): Promise<unknown> {
     return portalApi.tenantPost("/admin/settings", payload, { siteKey });
   },
+
+  uploadLogo(
+    formData: FormData,
+    siteKey?: string
+  ): Promise<{ logo_path: string; logo_url: string } | null> {
+    return portalApi.tenantPost<{ logo_path: string; logo_url: string } | null>(
+      "/admin/settings",
+      formData,
+      { siteKey }
+    );
+  },
 };

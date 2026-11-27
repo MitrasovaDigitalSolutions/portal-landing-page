@@ -28,4 +28,5 @@ export interface ServiceFormValues {
   is_featured: boolean;
   thumbnail: File | null;
   icon: File | null;
+  images: File[];
 }

@@ -19,10 +19,24 @@ export function PortalSidebar(): React.JSX.Element {
     <>
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 transition-all duration-200 lg:flex",
+          "sticky top-0 z-40 hidden h-screen shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 transition-all duration-200 lg:flex",
           isCollapsed ? "w-16" : "w-60"
         )}
       >
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={isCollapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
+          title={isCollapsed ? "Perluas Menu" : "Sembunyikan Menu"}
+          className="absolute top-2 -right-4 z-40 hidden h-12 w-4 cursor-pointer items-center justify-center rounded-r-lg border border-l-0 border-slate-200 bg-white text-slate-500 shadow-xs transition-all outline-none hover:bg-slate-50 hover:text-primary lg:flex"
+        >
+          {isCollapsed ? (
+            <ChevronsRight className="size-3 stroke-[2.75]" />
+          ) : (
+            <ChevronsLeft className="size-3 stroke-[2.75]" />
+          )}
+        </button>
+
         <div
           className={cn(
             "flex h-14 items-center border-b border-slate-100",
@@ -55,25 +69,6 @@ export function PortalSidebar(): React.JSX.Element {
         <Scrollable className="min-h-0 flex-1">
           <PortalNavList rail={isCollapsed} />
         </Scrollable>
-
-        <div className="border-t border-slate-100 p-2">
-          <button
-            type="button"
-            onClick={toggle}
-            title={isCollapsed ? "Perluas Sidebar" : "Ciutkan Sidebar"}
-            className={cn(
-              "flex w-full items-center rounded-lg py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900",
-              isCollapsed ? "justify-center px-2" : "gap-2 px-3"
-            )}
-          >
-            {isCollapsed ? (
-              <ChevronsRight className="size-4 shrink-0" />
-            ) : (
-              <ChevronsLeft className="size-4 shrink-0" />
-            )}
-            {isCollapsed ? null : <span>Ciutkan Menu</span>}
-          </button>
-        </div>
       </aside>
 
       <PortalMobileSidebar brandName="Mitrasova CMS" />

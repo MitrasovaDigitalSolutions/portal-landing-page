@@ -55,6 +55,27 @@ export function buildTestimonialColumns(): DataTableColumnDef<TestimonialItem>[]
       ),
     },
     {
+      id: "evidence",
+      header: "Bukti",
+      cell: ({ row }) => {
+        const proofUrl = resolveMediaUrl(
+          row.original.image_url ?? row.original.image_path
+        );
+        if (!proofUrl) {
+          return <span className="text-slate-400">—</span>;
+        }
+        return (
+          <SmartImage
+            src={proofUrl}
+            alt={`Bukti ${row.original.name}`}
+            width={40}
+            height={40}
+            className="size-10 rounded-lg border border-slate-200 object-cover"
+          />
+        );
+      },
+    },
+    {
       accessorKey: "rating",
       header: "Rating",
       cell: ({ row }) => (

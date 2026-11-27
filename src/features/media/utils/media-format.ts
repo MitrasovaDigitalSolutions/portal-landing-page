@@ -66,7 +66,7 @@ export function resolveUsageMeta(ref: MediaUsageRef): {
 
   switch (ref.type) {
     case "service":
-      return { typeLabel, href: "/services" };
+      return { typeLabel, href: `/services/${ref.id}/edit` };
     case "portfolio":
       return { typeLabel, href: "/portfolios" };
     case "branch":

@@ -8,6 +8,7 @@ import {
   type SettingsBulkPayload,
   type SettingsFormValues,
 } from "@/features/settings/schemas/settings.schema";
+import { syncModulePagesActiveState } from "@/services/module-page-sync.service";
 import type { ActionResult } from "@/types/http.types";
 import { extractZodFieldErrors } from "@/utils/zod-errors";
 
@@ -72,7 +73,8 @@ function buildBulkPayload(values: SettingsFormValues): SettingsBulkPayload {
 }
 
 export async function saveSettingsAction(
-  values: SettingsFormValues
+  values: SettingsFormValues,
+  logoFormData?: FormData
 ): Promise<ActionResult> {
   const parsed = settingsFormSchema.safeParse(values);
   if (!parsed.success) {
@@ -85,12 +87,28 @@ export async function saveSettingsAction(
 
   return withTenantAction(async ({ siteKey }) => {
     await settingsRepository.bulkUpdate(buildBulkPayload(parsed.data), siteKey);
+    if (logoFormData instanceof FormData && logoFormData.get("logo") instanceof File) {
+      await settingsRepository.uploadLogo(logoFormData, siteKey);
+    }
+    await syncModulePagesActiveState(
+      {
+        services: parsed.data.modules_services,
+        portfolios: parsed.data.modules_portfolios,
+        business_units: parsed.data.modules_business_units,
+        branches: parsed.data.modules_branches,
+        careers: parsed.data.modules_careers,
+        news: parsed.data.modules_news,
+        contact: parsed.data.modules_contact,
+      },
+      siteKey,
+      parsed.data.extra_pages_active
+    );
     revalidatePath("/", "layout");
-    revalidatePortalPaths(["/settings", "/"]);
+    revalidatePortalPaths(["/settings", "/pages", "/"]);
     return {
       success: true,
       data: undefined,
-      message: "Pengaturan situs dan modul berhasil disimpan.",
+      message: "Pengaturan situs dan visibilitas halaman berhasil disimpan.",
     };
   });
 }

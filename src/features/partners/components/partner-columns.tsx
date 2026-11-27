@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ExternalLink } from "lucide-react";
+import { Building2, ExternalLink, Phone } from "lucide-react";
 import { SmartImage } from "@/components/shared/smart-image";
 import type { DataTableColumnDef } from "@/components/ui/data-table";
 import type { PartnerItem } from "@/types/cms.types";
@@ -43,6 +43,23 @@ export function buildPartnerColumns(): DataTableColumnDef<PartnerItem>[] {
             )}
             <span className="font-semibold text-slate-900">{item.name}</span>
           </div>
+        );
+      },
+    },
+    {
+      accessorKey: "phone",
+      header: "Telepon / HP",
+      meta: { cellClassName: "whitespace-nowrap tabular-nums" },
+      cell: ({ row }) => {
+        const phone = row.original.phone;
+        if (!phone) {
+          return <span className="text-slate-400">—</span>;
+        }
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700">
+            <Phone className="size-3 text-slate-400" />
+            <span>{phone}</span>
+          </span>
         );
       },
     },

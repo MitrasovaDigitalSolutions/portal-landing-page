@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { resolveModuleKeyByPageSlug } from "@/config/modules";
 import { revalidatePortalPaths, withTenantAction } from "@/lib/actions/action-runner";
 import {
   pagesRepository,
@@ -12,6 +14,7 @@ import {
   type PageFormValues,
   type SectionJsonRequestValues,
 } from "@/features/pages/schemas/page.schemas";
+import { syncPageModuleVisibility } from "@/services/module-page-sync.service";
 import type { PageDetail, PageSection } from "@/types/cms.types";
 import type { ActionResult } from "@/types/http.types";
 import { readFormString } from "@/utils/form-data";
@@ -81,7 +84,11 @@ export async function updatePageAction(
       buildPagePayload(parsed.data, isHomeLocked),
       siteKey
     );
-    revalidatePortalPaths(["/pages", `/pages/${id}`, "/"]);
+    await syncPageModuleVisibility(data.slug, data.is_active, siteKey);
+    if (resolveModuleKeyByPageSlug(data.slug) !== null) {
+      revalidatePath("/", "layout");
+    }
+    revalidatePortalPaths(["/pages", `/pages/${id}`, "/settings", "/"]);
     return {
       success: true,
       data,

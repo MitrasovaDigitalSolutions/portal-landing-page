@@ -1,8 +1,9 @@
 "use client";
 
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { FormInput } from "@/components/forms/form-input";
 import { FormTextarea } from "@/components/forms/form-textarea";
+import { MapsLocationPicker } from "@/features/settings/components/maps-location-picker";
 import type { SettingsFormValues } from "@/features/settings/schemas/settings.schema";
 
 export function SettingsContactTab(): React.JSX.Element {
@@ -38,13 +39,7 @@ export function SettingsContactTab(): React.JSX.Element {
         rows={3}
       />
 
-      <FormInput<SettingsFormValues>
-        name="maps_embed"
-        label="URL Embed Google Maps"
-        placeholder="https://www.google.com/maps/embed?..."
-        leftIcon={<MapPin className="size-4" />}
-        helperText="Salin URL src dari kode iframe sematan Google Maps."
-      />
+      <MapsLocationPicker />
     </div>
   );
 }

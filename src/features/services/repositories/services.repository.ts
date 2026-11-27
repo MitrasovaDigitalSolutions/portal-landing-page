@@ -51,6 +51,20 @@ export const servicesRepository = {
     return normalizeListResponse(raw).items;
   },
 
+  async getServiceById(
+    id: number,
+    siteKey?: string
+  ): Promise<ServiceItem | null> {
+    try {
+      return await portalApi.tenantGet<ServiceItem>(`/admin/services/${id}`, {
+        siteKey,
+      });
+    } catch {
+      const all = await this.listServices(siteKey);
+      return all.find((item) => item.id === id) ?? null;
+    }
+  },
+
   createService(formData: FormData, siteKey?: string): Promise<ServiceItem> {
     return portalApi.tenantPost<ServiceItem>("/admin/services", formData, {
       siteKey,

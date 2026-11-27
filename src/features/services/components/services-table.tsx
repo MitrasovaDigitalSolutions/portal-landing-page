@@ -1,6 +1,8 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/portal/confirm-dialog";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { InputOption } from "@/components/ui/input-option";
 import { deleteServiceAction } from "@/features/services/actions/services.actions";
 import { buildServiceColumns } from "@/features/services/components/service-columns";
-import { ServiceFormDialog } from "@/features/services/components/service-form-dialog";
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
 import { useDeleteConfirm } from "@/hooks/use-delete-confirm";
 import { queryKeys } from "@/lib/query-keys";
@@ -24,12 +25,11 @@ export function ServicesTable({
   services,
   types,
 }: ServicesTableProps): React.JSX.Element {
+  const router = useRouter();
   const { activeSite } = useTenant();
   const siteKey = activeSite?.slug ?? "default";
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [formOpen, setFormOpen] = useState(false);
-  const [selected, setSelected] = useState<ServiceItem | null>(null);
   const deleteConfirm = useDeleteConfirm<ServiceItem>();
 
   const deleteMutation = useCrudMutation({
@@ -76,6 +76,9 @@ export function ServicesTable({
         searchValue={search}
         onSearchChange={setSearch}
         searchPlaceholder="Cari nama atau ringkasan layanan..."
+        onRowClick={(item) => {
+          router.push(`/services/${item.id}/edit`);
+        }}
         filterContent={
           <div className="w-44">
             <InputOption
@@ -90,10 +93,8 @@ export function ServicesTable({
         toolbarRight={
           <Button
             size="sm"
-            onClick={() => {
-              setSelected(null);
-              setFormOpen(true);
-            }}
+            nativeButton={false}
+            render={<Link href="/services/create" />}
             className="h-9 gap-1.5 rounded-xl px-3.5 text-xs font-semibold shadow-xs"
           >
             <Plus className="size-4" />
@@ -101,21 +102,13 @@ export function ServicesTable({
           </Button>
         }
         onEdit={(item) => {
-          setSelected(item);
-          setFormOpen(true);
+          router.push(`/services/${item.id}/edit`);
         }}
         onDelete={(item) => {
           deleteConfirm.requestDelete(item);
         }}
         emptyTitle="Belum ada layanan"
         emptyDescription="Tambahkan layanan atau produk baru untuk unit usaha ini."
-      />
-
-      <ServiceFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        service={selected}
-        types={types}
       />
 
       <ConfirmDialog

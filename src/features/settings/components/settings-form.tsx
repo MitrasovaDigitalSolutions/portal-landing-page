@@ -20,19 +20,22 @@ import { SettingsModulesTab } from "@/features/settings/components/settings-modu
 import { SettingsSeoTab } from "@/features/settings/components/settings-seo-tab";
 import { SettingsSocialTab } from "@/features/settings/components/settings-social-tab";
 import { useSettingsForm } from "@/features/settings/hooks/use-settings-form";
-import type { SiteSettingsMap } from "@/types/cms.types";
+import type { PageSummary, SiteSettingsMap } from "@/types/cms.types";
 
 interface SettingsFormProps {
   initialSettings: SiteSettingsMap;
+  pages: PageSummary[];
   siteKey: string;
 }
 
 export function SettingsForm({
   initialSettings,
+  pages,
   siteKey,
 }: SettingsFormProps): React.JSX.Element {
   const { methods, isSaving, logoUrl, onSubmit } = useSettingsForm(
     initialSettings,
+    pages,
     siteKey
   );
 
@@ -89,7 +92,7 @@ export function SettingsForm({
           </TabsContent>
 
           <TabsContent value="modules" className="mt-0">
-            <SettingsModulesTab />
+            <SettingsModulesTab pages={pages} />
           </TabsContent>
 
           <TabsContent value="display" className="mt-0">

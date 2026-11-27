@@ -1,11 +1,9 @@
 "use client";
 
-import { Building2 } from "lucide-react";
+import { FormImageUpload } from "@/components/forms/form-image-upload";
 import { FormInput } from "@/components/forms/form-input";
-import { SmartImage } from "@/components/shared/smart-image";
 import { BrandColorField } from "@/features/settings/components/brand-color-field";
 import type { SettingsFormValues } from "@/features/settings/schemas/settings.schema";
-import { resolveMediaUrl } from "@/utils/media";
 
 interface SettingsGeneralTabProps {
   logoUrl?: string;
@@ -14,8 +12,6 @@ interface SettingsGeneralTabProps {
 export function SettingsGeneralTab({
   logoUrl,
 }: SettingsGeneralTabProps): React.JSX.Element {
-  const resolvedLogo = resolveMediaUrl(logoUrl);
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -34,34 +30,15 @@ export function SettingsGeneralTab({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <BrandColorField />
 
-        <div className="space-y-1.5">
-          <span className="block text-xs font-semibold text-slate-700">
-            Logo Tenant Saat Ini
-          </span>
-          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
-            {resolvedLogo ? (
-              <SmartImage
-                src={resolvedLogo}
-                alt="Logo Tenant"
-                width={44}
-                height={44}
-                className="size-11 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-1"
-              />
-            ) : (
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400">
-                <Building2 className="size-5" />
-              </div>
-            )}
-            <div className="min-w-0 text-xs">
-              <p className="truncate font-semibold text-slate-700">
-                {logoUrl ? "Terhubung ke storage backend" : "Belum ada logo"}
-              </p>
-              <p className="truncate text-[11px] text-slate-400">
-                {logoUrl ?? "Logo dikelola oleh aset penyimpanan backend"}
-              </p>
-            </div>
-          </div>
-        </div>
+        <FormImageUpload<SettingsFormValues>
+          name="logo"
+          label="Logo Tenant"
+          initialUrl={logoUrl}
+          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          maxSizeMB={5}
+          previewClassName="h-32 bg-white"
+          helperText="Format JPG, PNG, WebP, atau SVG (maks. 5 MB). Disimpan saat klik Simpan Semua Pengaturan."
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

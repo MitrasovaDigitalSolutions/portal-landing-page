@@ -1,8 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { extractModulesState, isTenantModuleActive } from "@/config/modules";
+import {
+  extractModulesState,
+  isTenantModuleActive,
+  resolveModuleKeyByPageSlug,
+} from "@/config/modules";
 import { saveSettingsAction } from "@/features/settings/actions/settings.actions";
 import {
   SERVICES_LAYOUT_VALUES,
@@ -13,7 +18,7 @@ import {
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
 import { useServerErrors } from "@/hooks/use-server-errors";
 import { queryKeys } from "@/lib/query-keys";
-import type { SiteSettingsMap } from "@/types/cms.types";
+import type { PageSummary, SiteSettingsMap } from "@/types/cms.types";
 
 function readSettingText(
   group: Record<string, unknown> | undefined,
@@ -52,7 +57,25 @@ function readServicesLayout(
   return "accordion";
 }
 
-function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
+function buildExtraPagesInitialState(
+  pages: PageSummary[]
+): Record<string, boolean> {
+  const result: Record<string, boolean> = {};
+  for (const page of pages) {
+    if (
+      page.slug.trim().toLowerCase() !== "home" &&
+      resolveModuleKeyByPageSlug(page.slug) === null
+    ) {
+      result[String(page.id)] = page.is_active;
+    }
+  }
+  return result;
+}
+
+function buildInitialValues(
+  settings: SiteSettingsMap,
+  pages: PageSummary[]
+): SettingsFormValues {
   const general = settings.general;
   const legal = settings.legal;
   const contact = settings.contact;
@@ -61,6 +84,7 @@ function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
   const modules = extractModulesState(settings);
 
   return {
+    logo: null,
     site_title: readSettingText(general, "site_title"),
     tagline: readSettingText(general, "tagline"),
     meta_keywords: readSettingText(general, "meta_keywords"),
@@ -85,6 +109,7 @@ function buildInitialValues(settings: SiteSettingsMap): SettingsFormValues {
     modules_careers: isTenantModuleActive(modules, "careers"),
     modules_news: isTenantModuleActive(modules, "news"),
     modules_contact: isTenantModuleActive(modules, "contact"),
+    extra_pages_active: buildExtraPagesInitialState(pages),
     seo_meta_title: readSettingText(seo, "meta_title"),
     seo_meta_description: readSettingText(seo, "meta_description"),
     seo_alternate_names: readSettingText(seo, "alternate_names"),
@@ -106,18 +131,35 @@ export interface UseSettingsFormReturn {
 
 export function useSettingsForm(
   initialSettings: SiteSettingsMap,
+  pages: PageSummary[],
   siteKey: string
 ): UseSettingsFormReturn {
+  const initialValues = useMemo(
+    () => buildInitialValues(initialSettings, pages),
+    [initialSettings, pages]
+  );
+
   const methods = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsFormSchema),
-    values: buildInitialValues(initialSettings),
+    values: initialValues,
   });
 
   const applyServerErrors = useServerErrors(methods.setError);
 
   const mutation = useCrudMutation({
-    mutationFn: (values: SettingsFormValues) => saveSettingsAction(values),
-    invalidateKeys: [queryKeys.settings.all(siteKey)],
+    mutationFn: (values: SettingsFormValues) => {
+      const { logo, ...jsonValues } = values;
+      if (logo instanceof File) {
+        const logoFormData = new FormData();
+        logoFormData.append("logo", logo);
+        return saveSettingsAction(jsonValues, logoFormData);
+      }
+      return saveSettingsAction(jsonValues);
+    },
+    invalidateKeys: [queryKeys.settings.all(siteKey), queryKeys.pages.all(siteKey)],
+    onSuccess: () => {
+      methods.setValue("logo", null);
+    },
     onError: (result) => {
       applyServerErrors(result.fieldErrors);
     },
@@ -127,7 +169,9 @@ export function useSettingsForm(
     mutation.mutate(values);
   });
 
-  const rawLogo = readSettingText(initialSettings.general, "logo_url").trim();
+  const rawLogo =
+    readSettingText(initialSettings.general, "logo_url").trim() ||
+    readSettingText(initialSettings.general, "logo_path").trim();
   const logoUrl = rawLogo.length > 0 ? rawLogo : undefined;
 
   return {

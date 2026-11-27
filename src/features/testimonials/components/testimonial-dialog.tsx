@@ -24,6 +24,7 @@ interface TestimonialFormValues {
   message: string;
   is_active: boolean;
   avatar: File | null;
+  image: File | null;
 }
 
 interface TestimonialDialogProps {
@@ -41,6 +42,7 @@ function buildTestimonialFormData(values: TestimonialFormValues): FormData {
     .appendText("message", values.message.trim())
     .appendBoolean("is_active", values.is_active)
     .appendFile("avatar", values.avatar)
+    .appendFile("image", values.image)
     .build();
 }
 
@@ -61,6 +63,7 @@ export function TestimonialDialog({
       message: testimonial?.message ?? "",
       is_active: testimonial?.is_active ?? true,
       avatar: null,
+      image: null,
     },
   });
 
@@ -142,12 +145,21 @@ export function TestimonialDialog({
             required
           />
 
-          <FormImageUpload<TestimonialFormValues>
-            name="avatar"
-            label="Foto Profil Klien (Opsional)"
-            initialUrl={testimonial?.avatar_url ?? testimonial?.avatar_path}
-            aspectHint="1:1"
-          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormImageUpload<TestimonialFormValues>
+              name="avatar"
+              label="Foto Profil Klien (Opsional)"
+              initialUrl={testimonial?.avatar_url ?? testimonial?.avatar_path}
+              aspectHint="1:1"
+            />
+            <FormImageUpload<TestimonialFormValues>
+              name="image"
+              label="Screenshot Testimoni Asli (Opsional)"
+              initialUrl={testimonial?.image_url ?? testimonial?.image_path}
+              maxSizeMB={10}
+              aspectHint="4:3"
+            />
+          </div>
 
           <FormSwitch<TestimonialFormValues>
             name="is_active"

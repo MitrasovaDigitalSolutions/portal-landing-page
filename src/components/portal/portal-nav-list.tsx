@@ -32,11 +32,8 @@ export function PortalNavList({
   return (
     <nav className={cn("p-2.5", rail ? "space-y-1" : "space-y-2")}>
       {groups.map((group, groupIdx) => {
-        const hasActive = group.items.some((item) =>
-          isNavItemActive(pathname, item.href)
-        );
         const isOpen =
-          group.label === null || (overrides[group.key] ?? hasActive);
+          group.label === null || (overrides[group.key] ?? true);
         const showItems = rail || isOpen;
 
         return (
@@ -53,7 +50,7 @@ export function PortalNavList({
                 onClick={() => {
                   setOverrides((prev) => ({
                     ...prev,
-                    [group.key]: !(prev[group.key] ?? hasActive),
+                    [group.key]: !(prev[group.key] ?? true),
                   }));
                 }}
                 className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase transition-colors hover:text-slate-600"

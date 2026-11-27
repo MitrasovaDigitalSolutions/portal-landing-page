@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe } from "lucide-react";
+import { Globe, Phone } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormDialogFooter } from "@/components/forms/form-dialog-footer";
 import { FormImageUpload } from "@/components/forms/form-image-upload";
@@ -18,6 +18,7 @@ import { FormDataBuilder } from "@/utils/form-data";
 interface PartnerFormValues {
   name: string;
   website_url: string;
+  phone: string;
   order: number;
   logo: File | null;
 }
@@ -32,6 +33,7 @@ function buildPartnerFormData(values: PartnerFormValues): FormData {
   return new FormDataBuilder()
     .appendText("name", values.name.trim())
     .appendOptionalText("website_url", values.website_url.trim())
+    .appendOptionalText("phone", values.phone.trim())
     .appendNumber("order", values.order)
     .appendFile("logo", values.logo)
     .build();
@@ -49,6 +51,7 @@ export function PartnerDialog({
     values: {
       name: partner?.name ?? "",
       website_url: partner?.website_url ?? "",
+      phone: partner?.phone ?? "",
       order: partner?.order ?? 1,
       logo: null,
     },
@@ -115,13 +118,22 @@ export function PartnerDialog({
             />
           </div>
 
-          <FormInput<PartnerFormValues>
-            name="website_url"
-            label="Website Partner (Opsional)"
-            type="url"
-            placeholder="https://mitra.co.id"
-            leftIcon={<Globe className="size-4" />}
-          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormInput<PartnerFormValues>
+              name="website_url"
+              label="Website / Instagram (Opsional)"
+              type="url"
+              placeholder="https://instagram.com/mitra"
+              leftIcon={<Globe className="size-4" />}
+            />
+            <FormInput<PartnerFormValues>
+              name="phone"
+              label="Nomor HP / WhatsApp (Opsional)"
+              placeholder="081234567890"
+              maxLength={30}
+              leftIcon={<Phone className="size-4" />}
+            />
+          </div>
 
           <FormImageUpload<PartnerFormValues>
             name="logo"
