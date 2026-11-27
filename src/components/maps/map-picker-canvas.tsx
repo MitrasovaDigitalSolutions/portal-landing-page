@@ -3,14 +3,13 @@
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
 import { useEffect, useRef, type RefObject } from "react";
-import {
-  DEFAULT_MAP_CENTER,
-  type MapCoordinates,
-} from "@/features/settings/utils/maps-embed";
+import { cn } from "@/lib/utils";
+import { DEFAULT_MAP_CENTER, type MapCoordinates } from "@/utils/maps-embed";
 
 interface MapPickerCanvasProps {
   coordinates: MapCoordinates | null;
   onSelectCoordinates: (coords: MapCoordinates) => void;
+  heightClassName?: string;
 }
 
 function createPinIcon(L: typeof Leaflet): Leaflet.DivIcon {
@@ -50,6 +49,7 @@ function upsertDraggableMarker(
 export function MapPickerCanvas({
   coordinates,
   onSelectCoordinates,
+  heightClassName = "h-[290px]",
 }: MapPickerCanvasProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
@@ -156,7 +156,7 @@ export function MapPickerCanvas({
   return (
     <div
       ref={containerRef}
-      className="z-0 h-[290px] w-full bg-slate-100"
+      className={cn("z-0 w-full bg-slate-100", heightClassName)}
       aria-label="Peta interaktif pemilihan lokasi"
     />
   );

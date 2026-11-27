@@ -5,6 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { FormDialogFooter } from "@/components/forms/form-dialog-footer";
 import { FormInput } from "@/components/forms/form-input";
 import { FormInputStepper } from "@/components/forms/form-input-stepper";
+import { FormMapsLocationPicker } from "@/components/forms/form-maps-location-picker";
 import {
   FormMultiImageUpload,
   type ExistingGalleryItem,
@@ -34,6 +35,7 @@ function getBranchFormValues(branch: BranchItem | null): BranchFormValues {
     address: branch?.address ?? "",
     phone: branch?.phone ?? "",
     whatsapp: branch?.whatsapp ?? "",
+    maps_embed: branch?.maps_embed ?? "",
     order: branch?.order ?? 0,
     is_primary: branch?.is_primary ?? false,
     images: [],
@@ -46,6 +48,7 @@ function buildBranchFormData(values: BranchFormValues): FormData {
     .appendText("address", values.address.trim())
     .appendOptionalText("phone", values.phone.trim())
     .appendOptionalText("whatsapp", values.whatsapp.trim())
+    .appendOptionalText("maps_embed", values.maps_embed.trim())
     .appendNumber("order", values.order)
     .appendBoolean("is_primary", values.is_primary)
     .appendFiles("images", values.images)
@@ -144,6 +147,13 @@ export function BranchDialog({
             placeholder="Jl. Raya Solo - Tawangmangu..."
             rows={3}
             required
+          />
+
+          <FormMapsLocationPicker<BranchFormValues>
+            name="maps_embed"
+            addressFieldName="address"
+            label="Titik Lokasi Peta Cabang (Opsional)"
+            mapHeightClassName="h-[220px]"
           />
 
           <FormMultiImageUpload<BranchFormValues>

@@ -36,6 +36,18 @@ function parseCoordinatePair(latStr: string, lngStr: string): MapCoordinates | n
   return { lat, lng };
 }
 
+function extractCidFromEmbed(rawUrl: string): string | null {
+  const hexMatch = /!1s0x[0-9a-f]+(?::|%3A)0x([0-9a-f]+)/i.exec(rawUrl);
+  if (!hexMatch?.[1]) {
+    return null;
+  }
+  try {
+    return BigInt(`0x${hexMatch[1]}`).toString();
+  } catch {
+    return null;
+  }
+}
+
 export function buildGoogleMapsEmbedUrl(
   lat: number,
   lng: number,
@@ -45,7 +57,7 @@ export function buildGoogleMapsEmbedUrl(
 }
 
 export function buildGoogleMapsExternalUrl(lat: number, lng: number): string {
-  return `https://www.google.com/maps/search/?api=1&query=${lat.toFixed(6)},${lng.toFixed(6)}`;
+  return `https://maps.google.com/maps?ll=${lat.toFixed(6)},${lng.toFixed(6)}&q=${lat.toFixed(6)},${lng.toFixed(6)}&z=17&t=m&hl=id&gl=ID`;
 }
 
 export function extractMapsEmbedSrc(raw: string): string {
@@ -71,9 +83,8 @@ export function extractCoordinatesFromMapsUrl(
     return null;
   }
 
-  const queryMatch = /[?&](?:q|ll|center)=(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i.exec(
-    src
-  );
+  const queryMatch =
+    /[?&](?:q|ll|center)=(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i.exec(src);
   if (queryMatch?.[1] && queryMatch[2]) {
     const parsed = parseCoordinatePair(queryMatch[1], queryMatch[2]);
     if (parsed) return parsed;
@@ -98,4 +109,40 @@ export function extractCoordinatesFromMapsUrl(
   }
 
   return null;
+}
+
+export function resolveDirectMapsUrl(rawUrl: string): string | null {
+  const src = extractMapsEmbedSrc(rawUrl);
+  if (!src) {
+    return null;
+  }
+
+  const coords = extractCoordinatesFromMapsUrl(src);
+  const cid = extractCidFromEmbed(src);
+
+  if (src.includes("/maps/embed")) {
+    if (coords && cid) {
+      return `https://maps.google.com/maps?ll=${coords.lat},${coords.lng}&z=17&t=m&hl=id&gl=ID&mapclient=embed&cid=${cid}`;
+    }
+    if (coords) {
+      return buildGoogleMapsExternalUrl(coords.lat, coords.lng);
+    }
+    if (cid) {
+      return `https://maps.google.com/maps?hl=id&gl=ID&cid=${cid}`;
+    }
+  }
+
+  try {
+    const parsed = new URL(src);
+    if (parsed.searchParams.get("output") === "embed") {
+      parsed.searchParams.delete("output");
+      if (coords && !parsed.searchParams.has("ll")) {
+        parsed.searchParams.set("ll", `${coords.lat},${coords.lng}`);
+      }
+      return parsed.toString();
+    }
+    return parsed.toString();
+  } catch {
+    return src;
+  }
 }

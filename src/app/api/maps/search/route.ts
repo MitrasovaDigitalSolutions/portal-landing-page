@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { MapsSearchPlace } from "@/features/settings/utils/maps-embed";
+import type { MapsSearchPlace } from "@/utils/maps-embed";
 import { getPortalSession } from "@/lib/auth/auth";
 
 const GEOCODER_USER_AGENT = "MitrasovaPortalCMS/1.0 (+https://mitrasova.id)";

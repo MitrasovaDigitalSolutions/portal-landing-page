@@ -4,7 +4,7 @@ import { Compass, Loader2, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { MapsSearchPlace } from "@/features/settings/utils/maps-embed";
+import type { MapsSearchPlace } from "@/utils/maps-embed";
 
 interface MapsSearchBoxProps {
   currentAddress: string;

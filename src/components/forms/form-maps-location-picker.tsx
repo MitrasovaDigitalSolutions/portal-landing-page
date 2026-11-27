@@ -1,20 +1,32 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import {
+  useFormContext,
+  useWatch,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+} from "react-hook-form";
+import { MapPickerCanvas } from "@/components/maps/map-picker-canvas";
+import { MapsSearchBox } from "@/components/maps/maps-search-box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPickerCanvas } from "@/features/settings/components/map-picker-canvas";
-import { MapsSearchBox } from "@/features/settings/components/maps-search-box";
-import type { SettingsFormValues } from "@/features/settings/schemas/settings.schema";
 import {
   buildGoogleMapsEmbedUrl,
-  buildGoogleMapsExternalUrl,
   extractCoordinatesFromMapsUrl,
   extractMapsEmbedSrc,
+  resolveDirectMapsUrl,
   type MapCoordinates,
   type MapsSearchPlace,
-} from "@/features/settings/utils/maps-embed";
+} from "@/utils/maps-embed";
+
+interface FormMapsLocationPickerProps<T extends FieldValues> {
+  name: FieldPath<T>;
+  addressFieldName?: FieldPath<T>;
+  label?: string;
+  mapHeightClassName?: string;
+}
 
 async function fetchReverseAddress(
   coords: MapCoordinates,
@@ -42,14 +54,22 @@ function formatPickerStatusText(
   return "Klik peta atau cari lokasi untuk memasang pin.";
 }
 
-export function MapsLocationPicker(): React.JSX.Element {
-  const { control, setValue } = useFormContext<SettingsFormValues>();
-  const [mapsEmbedValue, addressValue] = useWatch({
-    control,
-    name: ["maps_embed", "address"],
-  });
+export function FormMapsLocationPicker<T extends FieldValues>({
+  name,
+  addressFieldName,
+  label = "Titik Lokasi Peta (Google Maps)",
+  mapHeightClassName = "h-[290px]",
+}: FormMapsLocationPickerProps<T>): React.JSX.Element {
+  const { control, setValue } = useFormContext<T>();
+  const mapsEmbedRaw = useWatch({ control, name });
+  const addressRaw = useWatch({ control, name: addressFieldName ?? name });
+
+  const mapsEmbedValue = typeof mapsEmbedRaw === "string" ? mapsEmbedRaw : "";
+  const addressValue =
+    addressFieldName && typeof addressRaw === "string" ? addressRaw : "";
 
   const parsedCoords = extractCoordinatesFromMapsUrl(mapsEmbedValue);
+  const directMapsHref = resolveDirectMapsUrl(mapsEmbedValue);
   const [suggestedAddress, setSuggestedAddress] = useState<string | null>(null);
   const [showManual, setShowManual] = useState(false);
   const reverseAbortRef = useRef<AbortController | null>(null);
@@ -60,15 +80,15 @@ export function MapsLocationPicker(): React.JSX.Element {
     };
   }, []);
 
-  const applyCoordinates = (coords: MapCoordinates): void => {
-    setValue("maps_embed", buildGoogleMapsEmbedUrl(coords.lat, coords.lng), {
+  const updateMapsValue = (nextVal: string): void => {
+    setValue(name, nextVal as PathValue<T, FieldPath<T>>, {
       shouldDirty: true,
       shouldValidate: true,
     });
   };
 
   const handleMapClickOrDrag = (coords: MapCoordinates): void => {
-    applyCoordinates(coords);
+    updateMapsValue(buildGoogleMapsEmbedUrl(coords.lat, coords.lng));
     reverseAbortRef.current?.abort();
     const controller = new AbortController();
     reverseAbortRef.current = controller;
@@ -81,7 +101,7 @@ export function MapsLocationPicker(): React.JSX.Element {
   };
 
   const handleSelectPlace = (place: MapsSearchPlace): void => {
-    applyCoordinates({ lat: place.lat, lng: place.lng });
+    updateMapsValue(buildGoogleMapsEmbedUrl(place.lat, place.lng));
     setSuggestedAddress(place.address);
   };
 
@@ -91,9 +111,7 @@ export function MapsLocationPicker(): React.JSX.Element {
   return (
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-slate-700">
-          Titik Lokasi Peta (Google Maps)
-        </span>
+        <span className="text-xs font-semibold text-slate-700">{label}</span>
         <button
           type="button"
           onClick={() => {
@@ -105,18 +123,16 @@ export function MapsLocationPicker(): React.JSX.Element {
         </button>
       </div>
 
-      <MapsSearchBox
-        currentAddress={addressValue}
-        onSelectPlace={handleSelectPlace}
-      />
+      <MapsSearchBox currentAddress={addressValue} onSelectPlace={handleSelectPlace} />
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <MapPickerCanvas
           coordinates={parsedCoords}
           onSelectCoordinates={handleMapClickOrDrag}
+          heightClassName={mapHeightClassName}
         />
 
-        {suggestedAddress ? (
+        {suggestedAddress && addressFieldName ? (
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 bg-primary/5 px-3 py-2 text-xs">
             <p className="min-w-0 flex-1 truncate text-slate-700">
               <strong className="font-semibold">Lokasi pin:</strong> {suggestedAddress}
@@ -126,7 +142,11 @@ export function MapsLocationPicker(): React.JSX.Element {
               variant="outline"
               size="sm"
               onClick={() => {
-                setValue("address", suggestedAddress, { shouldDirty: true, shouldValidate: true });
+                setValue(
+                  addressFieldName,
+                  suggestedAddress as PathValue<T, FieldPath<T>>,
+                  { shouldDirty: true, shouldValidate: true }
+                );
               }}
               className="h-7 shrink-0 rounded-lg border-primary/30 bg-white px-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
             >
@@ -139,9 +159,9 @@ export function MapsLocationPicker(): React.JSX.Element {
           <span className="font-mono text-slate-600">{statusText}</span>
 
           <div className="flex items-center gap-3">
-            {parsedCoords ? (
+            {directMapsHref ? (
               <a
-                href={buildGoogleMapsExternalUrl(parsedCoords.lat, parsedCoords.lng)}
+                href={directMapsHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-primary hover:underline"
@@ -153,7 +173,7 @@ export function MapsLocationPicker(): React.JSX.Element {
               <button
                 type="button"
                 onClick={() => {
-                  setValue("maps_embed", "", { shouldDirty: true, shouldValidate: true });
+                  updateMapsValue("");
                   setSuggestedAddress(null);
                 }}
                 className="font-semibold text-rose-600 hover:underline"
@@ -171,12 +191,14 @@ export function MapsLocationPicker(): React.JSX.Element {
             type="text"
             value={mapsEmbedValue}
             onChange={(e) => {
-              setValue("maps_embed", extractMapsEmbedSrc(e.target.value), { shouldDirty: true, shouldValidate: true });
+              updateMapsValue(extractMapsEmbedSrc(e.target.value));
             }}
             placeholder="https://www.google.com/maps/embed?... atau tempel kode <iframe>"
           />
           <p className="text-[11px] text-slate-500">
-            Opsional: tempel URL embed Google Maps atau kode <code className="font-mono">&lt;iframe&gt;</code>; atribut <code className="font-mono">src</code> diekstrak otomatis.
+            Tempel URL Google Maps, link embed, atau kode HTML{" "}
+            <code className="font-mono">&lt;iframe&gt;</code>; atribut{" "}
+            <code className="font-mono">src</code> diekstrak otomatis.
           </p>
         </div>
       ) : null}

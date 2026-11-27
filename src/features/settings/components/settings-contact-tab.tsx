@@ -2,9 +2,9 @@
 
 import { Mail, Phone } from "lucide-react";
 import { FormInput } from "@/components/forms/form-input";
+import { FormMapsLocationPicker } from "@/components/forms/form-maps-location-picker";
 import { FormTextarea } from "@/components/forms/form-textarea";
 import { FormWhatsappInput } from "@/components/forms/form-whatsapp-input";
-import { MapsLocationPicker } from "@/features/settings/components/maps-location-picker";
 import type { SettingsFormValues } from "@/features/settings/schemas/settings.schema";
 
 export function SettingsContactTab(): React.JSX.Element {
@@ -39,7 +39,11 @@ export function SettingsContactTab(): React.JSX.Element {
         rows={3}
       />
 
-      <MapsLocationPicker />
+      <FormMapsLocationPicker<SettingsFormValues>
+        name="maps_embed"
+        addressFieldName="address"
+        label="Titik Lokasi Peta (Google Maps)"
+      />
     </div>
   );
 }
