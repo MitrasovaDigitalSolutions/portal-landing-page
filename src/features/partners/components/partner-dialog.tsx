@@ -1,11 +1,12 @@
 "use client";
 
-import { Globe, Phone } from "lucide-react";
+import { Globe } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormDialogFooter } from "@/components/forms/form-dialog-footer";
 import { FormImageUpload } from "@/components/forms/form-image-upload";
 import { FormInput } from "@/components/forms/form-input";
 import { FormInputStepper } from "@/components/forms/form-input-stepper";
+import { FormWhatsappInput } from "@/components/forms/form-whatsapp-input";
 import { BaseDialog } from "@/components/ui/base-dialog";
 import { savePartnerAction } from "@/features/partners/actions/partners.actions";
 import { useCrudMutation } from "@/hooks/use-crud-mutation";
@@ -126,12 +127,11 @@ export function PartnerDialog({
               placeholder="https://instagram.com/mitra"
               leftIcon={<Globe className="size-4" />}
             />
-            <FormInput<PartnerFormValues>
+            <FormWhatsappInput<PartnerFormValues>
               name="phone"
               label="Nomor HP / WhatsApp (Opsional)"
-              placeholder="081234567890"
-              maxLength={30}
-              leftIcon={<Phone className="size-4" />}
+              placeholder="81234567890"
+
             />
           </div>
 

@@ -11,6 +11,7 @@ import {
 } from "@/components/forms/form-multi-image-upload";
 import { FormSwitch } from "@/components/forms/form-switch";
 import { FormTextarea } from "@/components/forms/form-textarea";
+import { FormWhatsappInput } from "@/components/forms/form-whatsapp-input";
 import { BaseDialog } from "@/components/ui/base-dialog";
 import { saveBranchAction } from "@/features/branches/actions/branches.actions";
 import type { BranchFormValues } from "@/features/branches/schemas/branch.schemas";
@@ -32,6 +33,7 @@ function getBranchFormValues(branch: BranchItem | null): BranchFormValues {
     name: branch?.name ?? "",
     address: branch?.address ?? "",
     phone: branch?.phone ?? "",
+    whatsapp: branch?.whatsapp ?? "",
     order: branch?.order ?? 0,
     is_primary: branch?.is_primary ?? false,
     images: [],
@@ -43,6 +45,7 @@ function buildBranchFormData(values: BranchFormValues): FormData {
     .appendText("name", values.name.trim())
     .appendText("address", values.address.trim())
     .appendOptionalText("phone", values.phone.trim())
+    .appendOptionalText("whatsapp", values.whatsapp.trim())
     .appendNumber("order", values.order)
     .appendBoolean("is_primary", values.is_primary)
     .appendFiles("images", values.images)
@@ -119,12 +122,21 @@ export function BranchDialog({
             />
           </div>
 
-          <FormInput<BranchFormValues>
-            name="phone"
-            label="Nomor Telepon (Opsional)"
-            placeholder="(0271)-6493247"
-            leftIcon={<Phone className="size-4" />}
-          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormInput<BranchFormValues>
+              name="phone"
+              label="Nomor Telepon (Opsional)"
+              placeholder="(0271)-6493247"
+              maxLength={40}
+              leftIcon={<Phone className="size-4" />}
+            />
+            <FormWhatsappInput<BranchFormValues>
+              name="whatsapp"
+              label="Nomor WhatsApp (Opsional)"
+              placeholder="82247170756"
+
+            />
+          </div>
 
           <FormTextarea<BranchFormValues>
             name="address"

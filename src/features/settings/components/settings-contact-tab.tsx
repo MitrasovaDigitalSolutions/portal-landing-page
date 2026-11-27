@@ -1,8 +1,9 @@
 "use client";
 
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { FormInput } from "@/components/forms/form-input";
 import { FormTextarea } from "@/components/forms/form-textarea";
+import { FormWhatsappInput } from "@/components/forms/form-whatsapp-input";
 import { MapsLocationPicker } from "@/features/settings/components/maps-location-picker";
 import type { SettingsFormValues } from "@/features/settings/schemas/settings.schema";
 
@@ -16,12 +17,11 @@ export function SettingsContactTab(): React.JSX.Element {
           placeholder="(0271)-6493247"
           leftIcon={<Phone className="size-4" />}
         />
-        <FormInput<SettingsFormValues>
+        <FormWhatsappInput<SettingsFormValues>
           name="whatsapp"
           label="Nomor WhatsApp CS"
-          placeholder="6281234567890"
-          leftIcon={<MessageCircle className="size-4" />}
-          helperText="Gunakan awalan kode negara (62) tanpa spasi."
+          placeholder="81234567890"
+
         />
         <FormInput<SettingsFormValues>
           name="email"

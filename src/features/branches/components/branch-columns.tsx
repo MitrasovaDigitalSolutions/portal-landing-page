@@ -1,6 +1,6 @@
 "use client";
 
-import { Building, Image as ImageIcon, MapPin, Phone } from "lucide-react";
+import { Building, Image as ImageIcon, MapPin, MessageCircle, Phone } from "lucide-react";
 import { SmartImage } from "@/components/shared/smart-image";
 import { Badge } from "@/components/ui/badge";
 import type { DataTableColumnDef } from "@/components/ui/data-table";
@@ -46,16 +46,29 @@ export function buildBranchColumns(): DataTableColumnDef<BranchItem>[] {
     },
     {
       accessorKey: "phone",
-      header: "Telepon",
-      cell: ({ row }) =>
-        row.original.phone ? (
-          <span className="inline-flex items-center gap-1.5 text-slate-700">
-            <Phone className="size-3.5 text-slate-400" />
-            {row.original.phone}
-          </span>
-        ) : (
-          <span className="text-slate-400">—</span>
-        ),
+      header: "Kontak",
+      cell: ({ row }) => {
+        const { phone, whatsapp } = row.original;
+        if (!phone && !whatsapp) {
+          return <span className="text-slate-400">—</span>;
+        }
+        return (
+          <div className="space-y-0.5 text-xs">
+            {whatsapp ? (
+              <span className="flex items-center gap-1.5 font-medium text-emerald-700">
+                <MessageCircle className="size-3.5 shrink-0 text-emerald-600" />
+                {whatsapp}
+              </span>
+            ) : null}
+            {phone ? (
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Phone className="size-3.5 shrink-0 text-slate-400" />
+                {phone}
+              </span>
+            ) : null}
+          </div>
+        );
+      },
     },
     {
       id: "type",
